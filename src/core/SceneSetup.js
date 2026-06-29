@@ -33,9 +33,9 @@ export function createCamera() {
     0.1,
     100
   );
-  // Offset to the right for a three-quarter vantage on the floating form
+  // Vantage from the upper-left, looking down at the floating form
   // (the light + matcher are independent and fixed, so this is purely visual).
-  camera.position.set(3.6, 2.8, 8.2);
-  camera.lookAt(0, 2.3, 0);
+  camera.position.set(-4.2, 4.8, 7.8);
+  camera.lookAt(0, 2.2, 0);
   return camera;
 }

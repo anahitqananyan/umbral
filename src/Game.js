@@ -111,7 +111,7 @@ export class Game {
       this.swayT += dt;
       this.camera.position.x = this.camBase.x + Math.sin(this.swayT * 0.25) * 0.18;
       this.camera.position.y = this.camBase.y + Math.sin(this.swayT * 0.19) * 0.1;
-      this.camera.lookAt(0, 2.3, 0);
+      this.camera.lookAt(0, 2.2, 0);
 
       this.debug?.update();
       this.renderer.render(this.scene, this.camera);
