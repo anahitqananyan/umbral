@@ -1,0 +1,17 @@
+{
+  "name": "umbral",
+  "version": "0.1.0",
+  "description": "A shadow-projection puzzle game — rotate abstract objects until their shadow becomes recognizable.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}
