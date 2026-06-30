@@ -12,8 +12,10 @@ import * as THREE from 'three';
 export const OBJECT_CENTER = new THREE.Vector3(0, 2.4, 0);
 
 // Half-size of the orthographic frustum used for BOTH the shadow and the match.
-// Sized to comfortably enclose the puzzle object's bounding volume.
-export const FRUSTUM_HALF = 2.7;
+// Sized to comfortably enclose the object's full ROTATIONAL bounding sphere — the
+// farthest piece (the rabbit's swung-out ear) sits ~3.63 from the pivot/OBJECT_CENTER,
+// so anything smaller clips the silhouette at the frustum edge for some poses.
+export const FRUSTUM_HALF = 4.0;
 
 // The light travels along -Z (straight at the wall). A pure axis keeps the cast
 // shadow == the object's XY silhouette, which is exactly what the matcher scores

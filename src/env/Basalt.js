@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { fbm2D } from '../util/noise.js';
 import { hash11, hash21 } from '../util/math.js';
+import { WALL_Z } from '../core/LightRig.js';
 
 // Procedural field of columnar basalt — hexagonal prisms of clustered, varied
 // heights — rendered as a SINGLE InstancedMesh (one draw call). Frames the scene
@@ -12,7 +13,7 @@ import { hash11, hash21 } from '../util/math.js';
 const CELL = 1.15;            // hex cell spacing
 const COL_RADIUS = 0.62;      // prism radius (baked into geometry)
 const CLEAR_X = 6.5;          // keep |x| < CLEAR_X clear when in front of the wall
-const CLEAR_Z = -4.5;         // ...and z > CLEAR_Z (between wall and camera)
+const CLEAR_Z = WALL_Z - 0.5; // ...and z > CLEAR_Z — clear all the way to (and just behind) the wall
 
 export function createBasalt() {
   // 6-sided cylinder == hexagonal prism. Translate so the base sits at y=0,
