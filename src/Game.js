@@ -3,7 +3,6 @@ import { createRenderer } from './core/Renderer.js';
 import { createScene, createCamera } from './core/SceneSetup.js';
 import { createLightRig } from './core/LightRig.js';
 import { createWall } from './env/Wall.js';
-import { createBasalt } from './env/Basalt.js';
 import { LEVELS } from './puzzle/levels.js';
 import { buildObject } from './puzzle/ObjectBuilder.js';
 import { Matcher } from './puzzle/Matcher.js';
@@ -21,7 +20,6 @@ export class Game {
     this.scene.add(rig.group);
 
     this.scene.add(createWall());
-    this.scene.add(createBasalt());
 
     this.matcher = new Matcher(this.renderer);
     this.arcball = new Arcball(this.renderer.domElement);

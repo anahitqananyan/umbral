@@ -53,6 +53,12 @@ export class Matcher {
     this.holdMs = 350;
     this.sampleInterval = 0.1; // seconds (~10 Hz)
 
+    // The level passes once the recognition bar holds near-full, rather than
+    // requiring a pixel-perfect (100%) match. `winProx`/`winRelease` are fractions
+    // of the displayed bar (which is smoothstep(0.4, threshold, iou)).
+    this.winProx = 0.95;
+    this.winRelease = 0.85;
+
     this._reset();
 
     this._group = null;
@@ -125,18 +131,45 @@ export class Matcher {
 
   _computeIoU() {
     this._renderMaskToBuffer();
-    const mask = this.solutionMask;
+    const sol = this.solutionMask;
     const buf = this.buffer;
     const n = SIZE * SIZE;
-    let inter = 0;
-    let uni = 0;
-    for (let i = 0; i < n; i++) {
-      const a = buf[i * 4] > 127 ? 1 : 0;
-      const b = mask[i];
-      inter += a & b;
-      uni += a | b;
+
+    // Extract the live silhouette as a binary mask.
+    const live = this._live || (this._live = new Uint8Array(n));
+    for (let i = 0; i < n; i++) live[i] = buf[i * 4] > 127 ? 1 : 0;
+
+    // Rotation-invariant match: the shadow's shape only forms at the right 3D
+    // orientation, but its in-plane *angle* should not matter — a correctly
+    // assembled shape that is merely tilted still counts. So we score IoU against
+    // the solution over a sweep of in-plane rotations (about the image center,
+    // which is where the object's pivot projects) and keep the best.
+    const ROT_STEPS = 36; // 10° resolution — within ~5° of any true angle
+    const c = (SIZE - 1) / 2;
+    let best = 0;
+    for (let s = 0; s < ROT_STEPS; s++) {
+      const theta = (s / ROT_STEPS) * Math.PI * 2;
+      const cos = Math.cos(theta);
+      const sin = Math.sin(theta);
+      let inter = 0;
+      let uni = 0;
+      for (let y = 0; y < SIZE; y++) {
+        const dy = y - c;
+        for (let x = 0; x < SIZE; x++) {
+          const dx = x - c;
+          // Inverse-rotate to sample the live mask at this output pixel.
+          const sx = (cos * dx + sin * dy + c) | 0;
+          const sy = (-sin * dx + cos * dy + c) | 0;
+          const a = sx >= 0 && sx < SIZE && sy >= 0 && sy < SIZE ? live[sy * SIZE + sx] : 0;
+          const b = sol[y * SIZE + x];
+          inter += a & b;
+          uni += a | b;
+        }
+      }
+      const iou = uni === 0 ? 0 : inter / uni;
+      if (iou > best) best = iou;
     }
-    this.iou = uni === 0 ? 0 : inter / uni;
+    this.iou = best;
   }
 
   // Called every frame. `isMoving` gates sampling (IoU can't change while idle).
@@ -162,11 +195,11 @@ export class Matcher {
     this._computeIoU();
     this._rawProx = smoothstep(0.4, this.threshold, this.iou);
 
-    // Schmitt-trigger win: must hold above threshold for holdMs; only resets
-    // once it drops below the lower release threshold.
-    if (this.iou >= this.threshold) {
+    // Schmitt-trigger win on the recognition bar: must hold at/above ~95% for
+    // holdMs; only resets once the bar drops below the lower release fraction.
+    if (this._rawProx >= this.winProx) {
       this.heldMs += elapsed * 1000;
-    } else if (this.iou < this.release) {
+    } else if (this._rawProx < this.winRelease) {
       this.heldMs = 0;
     }
 

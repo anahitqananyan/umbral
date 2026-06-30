@@ -23,17 +23,19 @@ export function createBasalt() {
 
   const mat = new THREE.MeshStandardMaterial({
     color: 0xffffff,        // tinted per-instance via instanceColor
-    roughness: 0.9,
-    metalness: 0.08,
-    flatShading: true,      // hard faceted volcanic-rock look
+    roughness: 0.96,        // matte, like painted room walls
+    metalness: 0.04,
+    flatShading: false,     // smooth, not faceted — reads as dark walls, not rock
   });
 
   // Gather instance transforms across a wide region, skipping the clear zone.
   const matrices = [];
   const colors = [];
   const dummy = new THREE.Object3D();
-  const baseColor = new THREE.Color(0x23242b);
-  const warm = new THREE.Color(0x3a3026);
+  // Neutral dark-grey palette so the field reads as the dim walls of a room
+  // rather than warm volcanic rock. Two close greys give only subtle variation.
+  const baseColor = new THREE.Color(0x14151a);
+  const warm = new THREE.Color(0x1e2026);
 
   const X_MIN = -26, X_MAX = 26;
   const Z_MIN = -26, Z_MAX = 9;
@@ -67,7 +69,7 @@ export function createBasalt() {
       matrices.push(dummy.matrix.clone());
 
       const tint = baseColor.clone().lerp(warm, hash11(jx + jz * 1.7) * 0.5);
-      const shade = 0.75 + hash11(jx * 1.3 - jz) * 0.4;
+      const shade = 0.85 + hash11(jx * 1.3 - jz) * 0.2; // tighter range -> uniform wall tone
       tint.multiplyScalar(shade);
       colors.push(tint.r, tint.g, tint.b);
     }
