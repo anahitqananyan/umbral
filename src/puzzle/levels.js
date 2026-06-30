@@ -17,7 +17,7 @@ export const LEVELS = [
   {
     name: 'Rabbit',
     hint: 'Something small that sits very still, and listens.',
-    solveThreshold: 0.86,
+    solveThreshold: 0.82,
     startQuat: quat(1.05, 2.2, 0.7),
     pieces: [
       // Body — large, slightly tall ellipsoid. (Z depths are spread wide so the
@@ -41,7 +41,7 @@ export const LEVELS = [
   {
     name: 'Key',
     hint: 'It opens what was closed.',
-    solveThreshold: 0.9,
+    solveThreshold: 0.85,
     startQuat: quat(0.6, 1.3, 1.9),
     pieces: [
       // Shaft — long cylinder laid along X. (Z depths spread wide so the key only
@@ -60,50 +60,191 @@ export const LEVELS = [
   {
     name: 'Cat',
     hint: 'Aloof and warm — and gone the moment you reach for it.',
-    solveThreshold: 0.86,
+    solveThreshold: 0.88,
     startQuat: quat(1.3, 2.0, 0.9),
     pieces: [
-      // Sitting body — tall ellipsoid.
-      { type: 'sphere', args: [1.15, 28, 20], pos: [0.0, -0.3, 0.6], scale: [0.95, 1.3, 0.95] },
-      // Chest / front base.
-      { type: 'sphere', args: [0.7, 24, 18], pos: [-0.1, -1.0, -1.4] },
+      // Rounded sitting body.
+      { type: 'sphere', args: [1.3, 28, 20], pos: [0.0, -0.95, 0.6], scale: [1.05, 1.25, 1.0] },
+      // Neck — joins body to head so the outline stays continuous.
+      { type: 'sphere', args: [0.5, 20, 16], pos: [0.0, 0.35, 0.9] },
       // Head.
-      { type: 'sphere', args: [0.8, 28, 20], pos: [0.05, 1.35, 1.4] },
-      // Ears — triangular cones of slightly different placement (breaks the flip).
-      { type: 'cone', args: [0.4, 0.85], pos: [-0.55, 2.15, -1.3] },
-      { type: 'cone', args: [0.4, 0.85], pos: [0.6, 2.2, 1.5] },
-      // Curled tail off to one side.
-      { type: 'capsule', args: [0.2, 1.8, 6, 16], pos: [1.6, 0.1, -1.1], rot: [0, 0, 0.4] },
+      { type: 'sphere', args: [0.85, 28, 20], pos: [0.0, 1.15, -1.2] },
+      // Ears — tall pointed cones tilted outward (the unmistakable cat cue).
+      { type: 'cone', args: [0.42, 1.0], pos: [-0.52, 1.9, -1.0], rot: [0, 0, 0.25] },
+      { type: 'cone', args: [0.42, 1.0], pos: [0.55, 1.95, 1.3], rot: [0, 0, -0.25] },
+      // Tail curving up the right side, clear of the body.
+      { type: 'capsule', args: [0.2, 1.9, 6, 16], pos: [1.5, -0.35, -1.3], rot: [0, 0, -0.6] },
     ],
   },
   {
     name: 'Sailboat',
     hint: 'It leans on the wind to wander.',
-    solveThreshold: 0.85,
+    solveThreshold: 0.91,
     startQuat: quat(0.8, 1.7, 1.2),
     pieces: [
-      // Hull — a rounded capsule laid flat.
-      { type: 'capsule', args: [0.5, 2.6, 6, 16], pos: [0.0, -1.5, 0.5], rot: [0, 0, Math.PI / 2] },
-      // Mast.
-      { type: 'cylinder', args: [0.1, 0.1, 3.8], pos: [0.0, 0.6, -1.3] },
-      // Mainsail — large triangle.
-      { type: 'cone', args: [1.2, 3.2], pos: [0.5, 0.6, 0.8] },
-      // Jib — smaller sail on the other side (asymmetry defeats the flip).
-      { type: 'cone', args: [0.6, 2.2], pos: [-0.9, 0.3, -1.5] },
+      // Hull — a wide flat lens (pointed bow & stern): the classic boat profile.
+      { type: 'sphere', args: [1.0, 32, 16], pos: [0.0, -1.55, 0.9], scale: [1.85, 0.5, 1.0] },
+      // Mast — tall and thin, rising from the hull.
+      { type: 'cylinder', args: [0.09, 0.09, 3.6], pos: [0.0, 0.45, -1.6] },
+      // Mainsail — large triangle to one side of the mast.
+      { type: 'cone', args: [1.3, 2.8], pos: [0.6, 0.5, 1.2] },
+      // Jib — smaller triangle on the other side (asymmetry, reads as a boat).
+      { type: 'cone', args: [0.7, 2.0], pos: [-0.9, 0.2, -1.8] },
     ],
   },
   {
     name: 'Wineglass',
     hint: 'Raise it — something is being celebrated.',
-    solveThreshold: 0.88,
+    solveThreshold: 0.93,
     startQuat: quat(1.1, 0.7, 1.6),
     pieces: [
-      // Bowl — a cone flipped apex-down for the V of the cup.
-      { type: 'cone', args: [1.1, 2.0], pos: [0.0, 1.4, 1.2], rot: [Math.PI, 0, 0] },
-      // Stem.
-      { type: 'cylinder', args: [0.1, 0.1, 1.4], pos: [0.0, -0.5, -1.4] },
-      // Foot — a flat wide disk.
-      { type: 'cylinder', args: [0.8, 0.8, 0.16], pos: [0.0, -1.25, 0.6] },
+      // Bowl — a wide, shallow cone flipped apex-down: the open V of the cup.
+      { type: 'cone', args: [1.3, 1.5], pos: [0.0, 1.2, 2.0], rot: [Math.PI, 0, 0] },
+      // Stem — long and thin.
+      { type: 'cylinder', args: [0.09, 0.09, 1.4], pos: [0.0, -0.2, -2.0] },
+      // Foot — a wide flat base.
+      { type: 'cylinder', args: [0.85, 0.85, 0.14], pos: [0.0, -0.95, 1.2] },
+    ],
+  },
+  {
+    name: 'Fish',
+    hint: 'It breathes the water it swims in.',
+    solveThreshold: 0.86,
+    startQuat: quat(0.9, 1.6, 0.8),
+    pieces: [
+      // Body — a wide ellipsoid.
+      { type: 'sphere', args: [1.1, 28, 20], pos: [-0.2, 0.0, 1.5], scale: [1.5, 1.0, 1.0] },
+      // Tail fin — a triangle fanning out behind (apex toward the body).
+      { type: 'cone', args: [0.9, 1.4], pos: [1.9, 0.0, -1.0], rot: [0, 0, Math.PI / 2] },
+      // Dorsal fin.
+      { type: 'cone', args: [0.4, 0.7], pos: [-0.3, 1.0, 0.8] },
+    ],
+  },
+  {
+    name: 'Mushroom',
+    hint: 'It rises overnight after the rain.',
+    solveThreshold: 0.86,
+    startQuat: quat(1.2, 0.9, 1.7),
+    pieces: [
+      // Cap — a wide, low dome.
+      { type: 'sphere', args: [1.5, 28, 18], pos: [0.0, 0.5, 1.4], scale: [1.3, 0.62, 1.0] },
+      // Stem — stout cylinder.
+      { type: 'cylinder', args: [0.5, 0.5, 1.8], pos: [0.0, -0.9, -1.5] },
+    ],
+  },
+  {
+    name: 'Pine Tree',
+    hint: 'It stays green while the rest let go.',
+    solveThreshold: 0.88,
+    startQuat: quat(0.7, 2.1, 1.1),
+    pieces: [
+      // Lower tier of foliage.
+      { type: 'cone', args: [1.5, 1.8], pos: [0.0, -0.2, 1.2] },
+      // Upper tier.
+      { type: 'cone', args: [1.1, 1.6], pos: [0.0, 1.0, -1.4] },
+      // Trunk.
+      { type: 'cylinder', args: [0.35, 0.35, 1.2], pos: [0.0, -1.6, 0.6] },
+    ],
+  },
+  {
+    name: 'House',
+    hint: 'Four walls that mean you are home.',
+    solveThreshold: 0.88,
+    startQuat: quat(1.4, 1.2, 0.6),
+    pieces: [
+      // Walls — a square box.
+      { type: 'box', args: [2.4, 2.0, 1.2], pos: [0.0, -0.6, 0.6] },
+      // Roof — a triangle.
+      { type: 'cone', args: [1.6, 1.3], pos: [0.0, 1.05, -1.3] },
+      // Chimney.
+      { type: 'box', args: [0.35, 0.7, 0.35], pos: [0.7, 1.4, 0.8] },
+    ],
+  },
+  {
+    name: 'Heart',
+    hint: 'It beats louder when you are near.',
+    solveThreshold: 0.89,
+    startQuat: quat(0.6, 1.9, 1.4),
+    pieces: [
+      // Two top lobes.
+      { type: 'sphere', args: [0.85, 24, 18], pos: [-0.7, 0.7, 1.3] },
+      { type: 'sphere', args: [0.85, 24, 18], pos: [0.7, 0.7, -1.3] },
+      // The point below — a downward triangle.
+      { type: 'cone', args: [1.7, 1.8], pos: [0.0, -0.4, 1.0], rot: [Math.PI, 0, 0] },
+    ],
+  },
+  {
+    name: 'Umbrella',
+    hint: 'It blooms only when the sky weeps.',
+    solveThreshold: 0.9,
+    startQuat: quat(1.0, 0.6, 2.0),
+    pieces: [
+      // Canopy — a wide dome.
+      { type: 'sphere', args: [1.8, 32, 16], pos: [0.0, 0.9, 1.2], scale: [1.0, 0.5, 1.0] },
+      // Pole.
+      { type: 'cylinder', args: [0.08, 0.08, 2.4], pos: [0.0, -0.3, -1.4] },
+      // Hooked handle.
+      { type: 'torus', args: [0.32, 0.09], pos: [-0.35, -1.35, 0.5] },
+    ],
+  },
+  {
+    name: 'Snowman',
+    hint: 'Three rounds of winter, stacked and smiling.',
+    solveThreshold: 0.9,
+    startQuat: quat(1.5, 1.4, 0.7),
+    pieces: [
+      // Base.
+      { type: 'sphere', args: [1.3, 28, 20], pos: [0.0, -1.4, 0.8] },
+      // Middle.
+      { type: 'sphere', args: [1.0, 26, 18], pos: [0.0, 0.3, -1.2] },
+      // Head.
+      { type: 'sphere', args: [0.75, 24, 18], pos: [0.0, 1.55, 1.0] },
+      // Hat brim.
+      { type: 'box', args: [1.4, 0.2, 1.0], pos: [0.0, 2.2, 0.4] },
+      // Hat top.
+      { type: 'box', args: [0.85, 0.75, 0.85], pos: [0.0, 2.65, -0.5] },
+    ],
+  },
+  {
+    name: 'Cactus',
+    hint: 'It hoards the desert and dares you to hold it.',
+    solveThreshold: 0.91,
+    startQuat: quat(0.8, 2.0, 1.2),
+    pieces: [
+      // Central column.
+      { type: 'capsule', args: [0.55, 2.6, 6, 16], pos: [0.0, -0.2, 1.0] },
+      // Left arm — out, then up.
+      { type: 'capsule', args: [0.3, 0.7, 6, 12], pos: [-0.85, 0.0, -1.3], rot: [0, 0, Math.PI / 2] },
+      { type: 'capsule', args: [0.3, 0.9, 6, 12], pos: [-1.25, 0.6, -1.3] },
+      // Right arm (higher — asymmetry).
+      { type: 'capsule', args: [0.3, 0.6, 6, 12], pos: [0.8, 0.5, 1.4], rot: [0, 0, Math.PI / 2] },
+      { type: 'capsule', args: [0.3, 0.7, 6, 12], pos: [1.15, 1.05, 1.4] },
+    ],
+  },
+  {
+    name: 'Mug',
+    hint: 'It holds the reason you wake up.',
+    solveThreshold: 0.91,
+    startQuat: quat(1.1, 1.5, 0.9),
+    pieces: [
+      // Cup body.
+      { type: 'cylinder', args: [0.95, 0.95, 2.0], pos: [-0.2, 0.0, 1.3] },
+      // Handle — a ring on the side.
+      { type: 'torus', args: [0.55, 0.16], pos: [1.0, 0.0, -1.5] },
+    ],
+  },
+  {
+    name: 'Airplane',
+    hint: 'It trades the ground for a thin line of cloud.',
+    solveThreshold: 0.92,
+    startQuat: quat(0.9, 1.8, 1.3),
+    pieces: [
+      // Fuselage — laid along X with a rounded nose.
+      { type: 'capsule', args: [0.45, 2.8, 6, 16], pos: [0.0, 0.0, 1.4], rot: [0, 0, Math.PI / 2] },
+      // Wings — a span across the body.
+      { type: 'box', args: [0.9, 2.6, 0.3], pos: [0.1, 0.0, -1.6] },
+      // Tailplane — smaller span at the rear.
+      { type: 'box', args: [0.6, 1.4, 0.3], pos: [-1.5, 0.0, 0.7] },
     ],
   },
 ];

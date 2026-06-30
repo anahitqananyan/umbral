@@ -41,11 +41,61 @@ export class Game {
 
     window.addEventListener('resize', () => this._onResize());
 
+    // Level-select wiring + progression. A level unlocks only once the previous
+    // one has been cleared; progress persists across reloads via localStorage.
+    this.selecting = false;
+    this.completed = this._loadProgress();
+    this.hud.onOpenLevelSelect = () => this.openLevelSelect();
+
+    // Load a level as a backdrop, then present the level-select page first.
     this._loadLevel(0);
     this.hud.hideLoading();
+    this.openLevelSelect();
+  }
+
+  _isUnlocked(index) {
+    return index === 0 || this.completed.has(index - 1);
+  }
+
+  _loadProgress() {
+    try {
+      const raw = localStorage.getItem('umbral.completed');
+      return new Set(raw ? JSON.parse(raw) : []);
+    } catch {
+      return new Set();
+    }
+  }
+
+  _saveProgress() {
+    try {
+      localStorage.setItem('umbral.completed', JSON.stringify([...this.completed]));
+    } catch {
+      /* storage unavailable — progress just won't persist */
+    }
+  }
+
+  selectLevel(index) {
+    if (!this._isUnlocked(index)) return; // locked: ignore (cards are disabled too)
+    this.selecting = false;
+    this.hud.hideLevelSelect();
+    this._loadLevel(index);
     setTimeout(() => {
-      if (!this.won) this.hud.showDragHint();
-    }, 1400);
+      if (!this.won && !this.selecting) this.hud.showDragHint();
+    }, 1200);
+  }
+
+  openLevelSelect() {
+    this.selecting = true;
+    this.won = false;
+    this.arcball.setEnabled(false);
+    this.hud.hideDragHint();
+    this.hud.hideWin();
+    const items = LEVELS.map((_, i) => ({
+      locked: !this._isUnlocked(i),
+      completed: this.completed.has(i),
+    }));
+    this.hud.renderLevelSelect(items, (i) => this.selectLevel(i));
+    this.hud.showLevelSelect();
   }
 
   _loadLevel(index) {
@@ -75,7 +125,8 @@ export class Game {
 
   _nextLevel() {
     const next = (this.levelIndex + 1) % LEVELS.length;
-    this._loadLevel(next);
+    // The just-cleared level unlocks the next, so this is always allowed.
+    this.selectLevel(next);
   }
 
   _onResize() {
@@ -89,9 +140,11 @@ export class Game {
   _handleWin() {
     this.won = true;
     this.arcball.setEnabled(false);
+    this.completed.add(this.levelIndex); // unlocks the next level
+    this._saveProgress();
     const name = LEVELS[this.levelIndex].name;
     this.hud.hideDragHint();
-    this.hud.showWin(name, () => this._nextLevel());
+    this.hud.showWin(name, () => this._nextLevel(), () => this.openLevelSelect());
   }
 
   start() {

@@ -165,7 +165,6 @@
         text-shadow: 0 4px 40px rgba(0,0,0,0.6);
       }
       #win button {
-        pointer-events: auto;
         margin-top: 8px;
         padding: 14px 38px;
         font-size: 13px;
@@ -180,6 +179,111 @@
         box-shadow: 0 6px 30px rgba(216, 180, 106, 0.3);
       }
       #win button:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(216, 180, 106, 0.45); }
+
+      #win .win-actions { display: flex; gap: 14px; margin-top: 8px; }
+      #win button.ghost {
+        background: transparent;
+        color: var(--ink-dim);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: none;
+      }
+      #win button.ghost:hover {
+        color: var(--ink);
+        border-color: rgba(216, 180, 106, 0.5);
+        box-shadow: none;
+      }
+
+      /* ---- levels button (HUD) ---- */
+      .levels-btn {
+        pointer-events: auto;
+        margin-top: 16px;
+        padding: 8px 18px;
+        font-size: 11px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 30px;
+        cursor: pointer;
+        transition: color 0.2s ease, border-color 0.2s ease;
+      }
+      .levels-btn:hover { color: var(--ink); border-color: rgba(216, 180, 106, 0.5); }
+
+      /* ---- level select ---- */
+      #level-select {
+        position: fixed;
+        inset: 0;
+        z-index: 25;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: radial-gradient(ellipse at center, rgba(6, 8, 10, 0.72), rgba(4, 5, 7, 0.95));
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+      #level-select.show { opacity: 1; pointer-events: auto; }
+      .ls-inner { width: min(900px, 92vw); text-align: center; }
+      .ls-eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.5em;
+        text-transform: uppercase;
+        color: var(--accent);
+        opacity: 0.85;
+      }
+      .ls-title {
+        font-size: 40px;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+        margin: 12px 0 34px;
+      }
+      .ls-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+        gap: 18px;
+      }
+      .ls-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 22px 22px;
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        cursor: pointer;
+        color: var(--ink);
+        font-family: inherit;
+        text-align: left;
+        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      }
+      .ls-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(216, 180, 106, 0.5);
+        background: rgba(20, 20, 26, 0.7);
+      }
+      .ls-card .num {
+        font-size: 11px;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+      }
+      .ls-card .nm { font-size: 24px; font-weight: 400; letter-spacing: 0.02em; }
+
+      .ls-card.done { border-color: rgba(127, 214, 168, 0.35); }
+      .ls-card.done .nm { color: var(--glow); }
+      .ls-card.locked {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .ls-card.locked:hover {
+        transform: none;
+        border-color: rgba(255, 255, 255, 0.08);
+        background: var(--panel);
+      }
+      .ls-card.locked .nm { color: var(--ink-dim); }
 
       /* ---- loading ---- */
       #loading {
@@ -213,6 +317,7 @@
         <div>
           <div class="level-tag" id="level-tag">Shadow I</div>
           <div class="hint" id="hint">Rotate the form…</div>
+          <button class="levels-btn" id="levels-btn">☰ Levels</button>
         </div>
         <div class="brand">
           Umbral
@@ -231,7 +336,18 @@
     <div id="win">
       <div class="recognized">Recognized</div>
       <h1 class="shape-name" id="win-name">Rabbit</h1>
-      <button id="next-btn">Next Shadow</button>
+      <div class="win-actions">
+        <button id="next-btn">Next Shadow</button>
+        <button id="select-btn" class="ghost">Level Select</button>
+      </div>
+    </div>
+
+    <div id="level-select">
+      <div class="ls-inner">
+        <div class="ls-eyebrow">Umbral</div>
+        <h2 class="ls-title">Choose a Shadow</h2>
+        <div class="ls-grid" id="level-grid"></div>
+      </div>
     </div>
 
     <div id="loading">Summoning the dark…</div>
