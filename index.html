@@ -285,6 +285,138 @@
       }
       .ls-card.locked .nm { color: var(--ink-dim); }
 
+      /* open-settings button on the level-select page */
+      .ls-settings-btn {
+        margin-top: 30px;
+        padding: 9px 22px;
+        font-size: 11px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 30px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: color 0.2s ease, border-color 0.2s ease;
+      }
+      .ls-settings-btn:hover { color: var(--ink); border-color: rgba(216, 180, 106, 0.5); }
+
+      /* ---- settings ---- */
+      #settings {
+        position: fixed;
+        inset: 0;
+        z-index: 27;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: radial-gradient(ellipse at center, rgba(6, 8, 10, 0.8), rgba(4, 5, 7, 0.97));
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+      }
+      #settings.show { opacity: 1; pointer-events: auto; }
+      .settings-card {
+        width: min(440px, 92vw);
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 32px 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+      }
+      .settings-title {
+        font-size: 30px;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+        margin: 6px 0 0;
+      }
+      .settings-progress {
+        font-size: 13px;
+        color: var(--ink-dim);
+        letter-spacing: 0.04em;
+        margin: 0 0 6px;
+      }
+      .settings-btn {
+        padding: 12px 20px;
+        font-size: 12px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        border-radius: 30px;
+        cursor: pointer;
+        font-family: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--ink);
+        transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      }
+      .settings-btn:hover { border-color: rgba(216, 180, 106, 0.5); }
+      .settings-btn.ghost { color: var(--ink-dim); }
+      .settings-btn.danger { color: #f0b6b6; border-color: rgba(220, 120, 120, 0.4); }
+      .settings-btn.danger:hover { background: rgba(220, 120, 120, 0.12); border-color: rgba(220, 120, 120, 0.7); }
+      .settings-confirm {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        border: 1px dashed rgba(220, 120, 120, 0.45);
+        border-radius: 12px;
+      }
+      .settings-confirm[hidden] { display: none; }
+      .settings-confirm p { margin: 0; font-size: 13px; color: var(--ink); }
+      .settings-confirm-actions { display: flex; gap: 10px; justify-content: center; }
+
+      /* ---- main menu ---- */
+      #main-menu {
+        position: fixed;
+        inset: 0;
+        z-index: 28;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: radial-gradient(ellipse at center, rgba(6, 8, 10, 0.55), rgba(4, 5, 7, 0.92));
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+      }
+      #main-menu.show { opacity: 1; pointer-events: auto; }
+      .mm-title {
+        font-size: 72px;
+        font-weight: 300;
+        letter-spacing: 0.18em;
+        margin: 0;
+        color: var(--ink);
+        text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
+      }
+      .mm-tagline {
+        font-size: 12px;
+        letter-spacing: 0.5em;
+        text-transform: uppercase;
+        color: var(--accent);
+        opacity: 0.85;
+        margin: 14px 0 34px;
+      }
+      .mm-play {
+        padding: 16px 64px;
+        font-size: 15px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #0a0a0c;
+        background: linear-gradient(90deg, var(--accent), #e7cf94);
+        border: none;
+        border-radius: 40px;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: 0 6px 30px rgba(216, 180, 106, 0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .mm-play:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(216, 180, 106, 0.45); }
+
       /* ---- loading ---- */
       #loading {
         position: fixed;
@@ -342,11 +474,35 @@
       </div>
     </div>
 
+    <div id="main-menu">
+      <h1 class="mm-title">Umbral</h1>
+      <div class="mm-tagline">cast a shadow worth knowing</div>
+      <button class="mm-play" id="play-btn">Play</button>
+    </div>
+
     <div id="level-select">
       <div class="ls-inner">
         <div class="ls-eyebrow">Umbral</div>
         <h2 class="ls-title">Choose a Shadow</h2>
         <div class="ls-grid" id="level-grid"></div>
+        <button class="ls-settings-btn" id="settings-open">⚙ Settings</button>
+      </div>
+    </div>
+
+    <div id="settings">
+      <div class="settings-card">
+        <div class="ls-eyebrow">Umbral</div>
+        <h2 class="settings-title">Settings</h2>
+        <p class="settings-progress" id="settings-progress">No shadows cleared yet.</p>
+        <button id="reset-btn" class="settings-btn danger">Reset Progress</button>
+        <div class="settings-confirm" id="reset-confirm" hidden>
+          <p>This relocks every shadow but the first. Are you sure?</p>
+          <div class="settings-confirm-actions">
+            <button id="reset-yes" class="settings-btn danger">Yes, reset</button>
+            <button id="reset-no" class="settings-btn ghost">Cancel</button>
+          </div>
+        </div>
+        <button id="settings-close" class="settings-btn ghost">Close</button>
       </div>
     </div>
 

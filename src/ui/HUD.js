@@ -1,11 +1,6 @@
 // Thin wrapper around the DOM overlay declared in index.html. Keeps all
 // document queries in one place.
 
-const ROMAN = [
-  'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X',
-  'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX',
-];
-
 export class HUD {
   constructor() {
     this.levelTag = document.getElementById('level-tag');
@@ -18,17 +13,43 @@ export class HUD {
     this.selectBtn = document.getElementById('select-btn');
     this.loading = document.getElementById('loading');
 
+    this.mainMenu = document.getElementById('main-menu');
+    this.playBtn = document.getElementById('play-btn');
+
     this.levelSelect = document.getElementById('level-select');
     this.levelGrid = document.getElementById('level-grid');
     this.levelsBtn = document.getElementById('levels-btn');
 
-    // Set by Game; opens the level-select page from the HUD button.
+    // Settings overlay.
+    this.settings = document.getElementById('settings');
+    this.settingsProgress = document.getElementById('settings-progress');
+    this.settingsOpenBtn = document.getElementById('settings-open');
+    this.settingsCloseBtn = document.getElementById('settings-close');
+    this.resetBtn = document.getElementById('reset-btn');
+    this.resetConfirm = document.getElementById('reset-confirm');
+    this.resetYesBtn = document.getElementById('reset-yes');
+    this.resetNoBtn = document.getElementById('reset-no');
+
+    // Set by Game.
+    this.onPlay = null;
     this.onOpenLevelSelect = null;
+    this.onOpenSettings = null;
+    this.onResetProgress = null;
+
+    this.playBtn.onclick = () => this.onPlay?.();
     this.levelsBtn.onclick = () => this.onOpenLevelSelect?.();
+    this.settingsOpenBtn.onclick = () => this.onOpenSettings?.();
+    this.settingsCloseBtn.onclick = () => this.hideSettings();
+    this.resetBtn.onclick = () => { this.resetConfirm.hidden = false; };
+    this.resetNoBtn.onclick = () => { this.resetConfirm.hidden = true; };
+    this.resetYesBtn.onclick = () => {
+      this.resetConfirm.hidden = true;
+      this.onResetProgress?.();
+    };
   }
 
   setLevel(index, name, hint) {
-    this.levelTag.textContent = `Shadow ${ROMAN[index] ?? index + 1}`;
+    this.levelTag.textContent = `Level ${index + 1}`;
     this.hint.textContent = hint;
   }
 
@@ -74,11 +95,10 @@ export class HUD {
       if (it.locked) card.classList.add('locked');
       if (it.completed) card.classList.add('done');
 
-      const roman = ROMAN[i] ?? i + 1;
       const icon = it.locked ? '🔒' : it.completed ? '✓' : '◆';
       const label = it.locked ? 'Locked' : it.completed ? 'Cleared' : 'Enter';
       card.innerHTML =
-        `<span class="num">Shadow ${roman}</span>` +
+        `<span class="num">Level ${i + 1}</span>` +
         `<span class="nm">${icon} ${label}</span>`;
 
       if (it.locked) {
@@ -90,12 +110,33 @@ export class HUD {
     });
   }
 
+  showMainMenu() {
+    this.mainMenu.classList.add('show');
+  }
+
+  hideMainMenu() {
+    this.mainMenu.classList.remove('show');
+  }
+
   showLevelSelect() {
     this.levelSelect.classList.add('show');
   }
 
   hideLevelSelect() {
     this.levelSelect.classList.remove('show');
+  }
+
+  setSettingsProgress(text) {
+    this.settingsProgress.textContent = text;
+  }
+
+  showSettings() {
+    this.resetConfirm.hidden = true; // always start collapsed
+    this.settings.classList.add('show');
+  }
+
+  hideSettings() {
+    this.settings.classList.remove('show');
   }
 
   hideLoading() {

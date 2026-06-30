@@ -63,17 +63,18 @@ export const LEVELS = [
     solveThreshold: 0.88,
     startQuat: quat(1.3, 2.0, 0.9),
     pieces: [
-      // Rounded sitting body.
-      { type: 'sphere', args: [1.3, 28, 20], pos: [0.0, -0.95, 0.6], scale: [1.05, 1.25, 1.0] },
-      // Neck — joins body to head so the outline stays continuous.
-      { type: 'sphere', args: [0.5, 20, 16], pos: [0.0, 0.35, 0.9] },
+      // Haunches — the wide base the cat sits on.
+      { type: 'sphere', args: [1.1, 28, 20], pos: [0.0, -1.25, 0.7], scale: [1.2, 0.9, 1.0] },
+      // Chest / torso — taller than wide, rising to the neck.
+      { type: 'sphere', args: [0.9, 28, 20], pos: [0.0, 0.1, -1.3], scale: [0.85, 1.3, 1.0] },
       // Head.
-      { type: 'sphere', args: [0.85, 28, 20], pos: [0.0, 1.15, -1.2] },
-      // Ears — tall pointed cones tilted outward (the unmistakable cat cue).
-      { type: 'cone', args: [0.42, 1.0], pos: [-0.52, 1.9, -1.0], rot: [0, 0, 0.25] },
-      { type: 'cone', args: [0.42, 1.0], pos: [0.55, 1.95, 1.3], rot: [0, 0, -0.25] },
-      // Tail curving up the right side, clear of the body.
-      { type: 'capsule', args: [0.2, 1.9, 6, 16], pos: [1.5, -0.35, -1.3], rot: [0, 0, -0.6] },
+      { type: 'sphere', args: [0.82, 28, 20], pos: [0.0, 1.55, 1.2] },
+      // Ears — tall triangular cones, the unmistakable cat cue.
+      { type: 'cone', args: [0.42, 1.0], pos: [-0.52, 2.25, -1.0], rot: [0, 0, 0.16] },
+      { type: 'cone', args: [0.42, 1.0], pos: [0.52, 2.3, 1.3], rot: [0, 0, -0.16] },
+      // Tail — sweeps UP the right side and curls, not out at the bottom.
+      { type: 'capsule', args: [0.2, 1.5, 6, 16], pos: [1.05, -0.55, -1.2], rot: [0, 0, -0.45] },
+      { type: 'capsule', args: [0.2, 1.0, 6, 16], pos: [1.5, 0.5, -1.2], rot: [0, 0, 0.05] },
     ],
   },
   {
@@ -179,12 +180,20 @@ export const LEVELS = [
     solveThreshold: 0.9,
     startQuat: quat(1.0, 0.6, 2.0),
     pieces: [
-      // Canopy — a wide dome.
-      { type: 'sphere', args: [1.8, 32, 16], pos: [0.0, 0.9, 1.2], scale: [1.0, 0.5, 1.0] },
-      // Pole.
-      { type: 'cylinder', args: [0.08, 0.08, 2.4], pos: [0.0, -0.3, -1.4] },
-      // Hooked handle.
-      { type: 'torus', args: [0.32, 0.09], pos: [-0.35, -1.35, 0.5] },
+      // Canopy — a wide, peaked dome with a flat lower edge.
+      { type: 'cone', args: [2.0, 1.2], pos: [0.0, 0.25, 1.2] },
+      // Finial — the little spike on top.
+      { type: 'cylinder', args: [0.06, 0.06, 0.5], pos: [0.0, 1.05, 1.2] },
+      // Scalloped hem — rib tips hanging from the canopy edge (the umbrella cue).
+      { type: 'cone', args: [0.5, 0.6], pos: [-1.4, -0.4, -1.0], rot: [Math.PI, 0, 0] },
+      { type: 'cone', args: [0.5, 0.6], pos: [-0.47, -0.4, 0.8], rot: [Math.PI, 0, 0] },
+      { type: 'cone', args: [0.5, 0.6], pos: [0.47, -0.4, -0.8], rot: [Math.PI, 0, 0] },
+      { type: 'cone', args: [0.5, 0.6], pos: [1.4, -0.4, 1.0], rot: [Math.PI, 0, 0] },
+      // Pole — runs up into the canopy.
+      { type: 'cylinder', args: [0.07, 0.07, 2.2], pos: [0.0, -0.6, -1.5] },
+      // Hooked handle — a J at the foot of the pole.
+      { type: 'capsule', args: [0.12, 0.5, 6, 12], pos: [-0.28, -1.7, 0.6], rot: [0, 0, Math.PI / 2] },
+      { type: 'capsule', args: [0.12, 0.45, 6, 12], pos: [-0.62, -1.42, 0.6] },
     ],
   },
   {
@@ -245,6 +254,90 @@ export const LEVELS = [
       { type: 'box', args: [0.9, 2.6, 0.3], pos: [0.1, 0.0, -1.6] },
       // Tailplane — smaller span at the rear.
       { type: 'box', args: [0.6, 1.4, 0.3], pos: [-1.5, 0.0, 0.7] },
+    ],
+  },
+  {
+    name: 'Flower',
+    hint: 'It turns its face to follow the sun.',
+    solveThreshold: 0.9,
+    startQuat: quat(1.2, 1.7, 0.5),
+    pieces: [
+      // Center.
+      { type: 'sphere', args: [0.55, 24, 18], pos: [0.0, 0.85, 1.0] },
+      // Five petals around the center (bottom left open for the stem).
+      { type: 'sphere', args: [0.5, 20, 16], pos: [0.0, 1.8, -1.0] },
+      { type: 'sphere', args: [0.5, 20, 16], pos: [0.82, 1.28, 1.2] },
+      { type: 'sphere', args: [0.5, 20, 16], pos: [0.82, 0.42, -1.2] },
+      { type: 'sphere', args: [0.5, 20, 16], pos: [-0.82, 1.28, 1.2] },
+      { type: 'sphere', args: [0.5, 20, 16], pos: [-0.82, 0.42, -1.2] },
+      // Stem.
+      { type: 'cylinder', args: [0.08, 0.08, 2.2], pos: [0.0, -0.9, 0.6] },
+      // Leaf.
+      { type: 'sphere', args: [0.4, 18, 14], pos: [0.55, -0.9, -0.8], scale: [1.7, 0.7, 1.0], rot: [0, 0, -0.5] },
+    ],
+  },
+  {
+    name: 'Anchor',
+    hint: 'It holds you steady when the tide pulls.',
+    solveThreshold: 0.91,
+    startQuat: quat(0.7, 1.4, 1.8),
+    pieces: [
+      // Ring at the top.
+      { type: 'torus', args: [0.42, 0.13], pos: [0.0, 1.65, 1.0] },
+      // Shaft.
+      { type: 'cylinder', args: [0.15, 0.15, 2.9], pos: [0.0, 0.05, -1.3] },
+      // Stock (the crossbar near the top).
+      { type: 'capsule', args: [0.12, 1.5, 6, 12], pos: [0.0, 0.85, 1.2], rot: [0, 0, Math.PI / 2] },
+      // Flukes — two arms sweeping out at the bottom.
+      { type: 'capsule', args: [0.14, 1.0, 6, 12], pos: [-0.55, -1.0, -1.0], rot: [0, 0, 0.8] },
+      { type: 'capsule', args: [0.14, 1.0, 6, 12], pos: [0.55, -1.0, 1.0], rot: [0, 0, -0.8] },
+    ],
+  },
+  {
+    name: 'Ice Cream',
+    hint: 'Sweet, and racing the warmth to melt.',
+    solveThreshold: 0.91,
+    startQuat: quat(1.0, 2.0, 0.9),
+    pieces: [
+      // Waffle cone — apex down.
+      { type: 'cone', args: [0.75, 2.0], pos: [0.0, -0.3, 1.0], rot: [Math.PI, 0, 0] },
+      // Scoops.
+      { type: 'sphere', args: [0.78, 24, 18], pos: [0.0, 0.85, -1.2] },
+      { type: 'sphere', args: [0.62, 22, 16], pos: [-0.3, 1.65, 1.1] },
+    ],
+  },
+  {
+    name: 'Hourglass',
+    hint: 'It says the same thing, upside down or not: time runs.',
+    solveThreshold: 0.92,
+    startQuat: quat(0.6, 1.1, 1.5),
+    pieces: [
+      // Upper bulb — a downward cone.
+      { type: 'cone', args: [1.0, 1.5], pos: [0.0, 0.75, 1.2], rot: [Math.PI, 0, 0] },
+      // Lower bulb — an upward cone meeting it at the pinch.
+      { type: 'cone', args: [1.0, 1.5], pos: [0.0, -0.75, -1.2] },
+      // Top and bottom caps.
+      { type: 'box', args: [2.3, 0.28, 1.0], pos: [0.0, 1.6, 0.8] },
+      { type: 'box', args: [2.3, 0.28, 1.0], pos: [0.0, -1.6, -0.8] },
+    ],
+  },
+  {
+    name: 'Bird',
+    hint: 'It owns the morning before anyone wakes.',
+    solveThreshold: 0.93,
+    startQuat: quat(1.3, 0.8, 1.1),
+    pieces: [
+      // Body.
+      { type: 'sphere', args: [0.9, 26, 18], pos: [-0.1, 0.0, 1.0], scale: [1.3, 1.0, 1.0] },
+      // Head.
+      { type: 'sphere', args: [0.55, 22, 16], pos: [1.0, 0.75, -1.1] },
+      // Beak — a small cone pointing forward.
+      { type: 'cone', args: [0.22, 0.65], pos: [1.7, 0.7, -1.1], rot: [0, 0, -Math.PI / 2] },
+      // Tail — a fan sweeping back.
+      { type: 'cone', args: [0.5, 1.1], pos: [-1.0, 0.05, 1.2], rot: [0, 0, -Math.PI / 2] },
+      // Legs.
+      { type: 'capsule', args: [0.07, 0.55, 6, 10], pos: [0.1, -1.05, 0.8] },
+      { type: 'capsule', args: [0.07, 0.55, 6, 10], pos: [0.5, -1.05, 0.8] },
     ],
   },
 ];

@@ -46,11 +46,30 @@ export class Game {
     this.selecting = false;
     this.completed = this._loadProgress();
     this.hud.onOpenLevelSelect = () => this.openLevelSelect();
+    this.hud.onOpenSettings = () => {
+      this.hud.setSettingsProgress(this._progressText());
+      this.hud.showSettings();
+    };
+    this.hud.onResetProgress = () => this.resetProgress();
+    this.hud.onPlay = () => {
+      this.hud.hideMainMenu();
+      this.openLevelSelect();
+    };
 
-    // Load a level as a backdrop, then present the level-select page first.
+    // Load a level as a backdrop, then present the main menu first.
     this._loadLevel(0);
     this.hud.hideLoading();
-    this.openLevelSelect();
+    this.openMainMenu();
+  }
+
+  openMainMenu() {
+    this.selecting = true;
+    this.won = false;
+    this.arcball.setEnabled(false);
+    this.hud.hideDragHint();
+    this.hud.hideWin();
+    this.hud.hideLevelSelect();
+    this.hud.showMainMenu();
   }
 
   _isUnlocked(index) {
@@ -90,12 +109,30 @@ export class Game {
     this.arcball.setEnabled(false);
     this.hud.hideDragHint();
     this.hud.hideWin();
+    this._refreshLevelSelect();
+    this.hud.showLevelSelect();
+  }
+
+  _refreshLevelSelect() {
     const items = LEVELS.map((_, i) => ({
       locked: !this._isUnlocked(i),
       completed: this.completed.has(i),
     }));
     this.hud.renderLevelSelect(items, (i) => this.selectLevel(i));
-    this.hud.showLevelSelect();
+  }
+
+  _progressText() {
+    const n = this.completed.size;
+    const total = LEVELS.length;
+    return n === 0 ? 'No shadows cleared yet.' : `${n} of ${total} shadows cleared.`;
+  }
+
+  resetProgress() {
+    this.completed = new Set();
+    this._saveProgress();
+    this._refreshLevelSelect(); // relock the grid behind the settings panel
+    this.hud.setSettingsProgress(this._progressText());
+    this.hud.hideSettings();
   }
 
   _loadLevel(index) {
