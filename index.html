@@ -306,7 +306,7 @@
       #settings {
         position: fixed;
         inset: 0;
-        z-index: 27;
+        z-index: 29;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -386,9 +386,11 @@
       }
       #main-menu.show { opacity: 1; pointer-events: auto; }
       .mm-title {
-        font-size: 72px;
-        font-weight: 300;
-        letter-spacing: 0.18em;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 92px;
+        font-weight: 700;
+        font-style: oblique 8deg;
+        letter-spacing: -0.01em;
         margin: 0;
         color: var(--ink);
         text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
@@ -478,6 +480,7 @@
       <h1 class="mm-title">Umbral</h1>
       <div class="mm-tagline">cast a shadow worth knowing</div>
       <button class="mm-play" id="play-btn">Play</button>
+      <button class="ls-settings-btn" id="settings-open">⚙ Settings</button>
     </div>
 
     <div id="level-select">
@@ -485,7 +488,6 @@
         <div class="ls-eyebrow">Umbral</div>
         <h2 class="ls-title">Choose a Shadow</h2>
         <div class="ls-grid" id="level-grid"></div>
-        <button class="ls-settings-btn" id="settings-open">⚙ Settings</button>
       </div>
     </div>
 
