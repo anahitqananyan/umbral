@@ -531,10 +531,10 @@ export const LEVELS = [
       { type: 'capsule', args: [0.095, 0.517, 10, 16], pos: [1.75, 1.85, 1.4], rot: [0, 0, 0.142] },
       // Front-left limb — reaching up and to the left.
       { type: 'capsule', args: [0.15, 0.94, 10, 16], pos: [-1.675, 0.95, 1.5], rot: [0, 0, 0.87] },
-      // Front-right limb — reaching up and to the right.
-      { type: 'capsule', args: [0.15, 0.87, 10, 16], pos: [-0.375, 0.55, -1.5], rot: [0, 0, -0.815] },
-      // Hind-left limb — splayed out to the left.
-      { type: 'capsule', args: [0.15, 1.19, 10, 16], pos: [-1.225, -0.425, 1.2], rot: [0, 0, 1.331] },
+      // Front-right limb — reaching up and to the right (rooted deep in the spine).
+      { type: 'capsule', args: [0.15, 1.0, 10, 16], pos: [-0.334, 0.426, -1.5], rot: [0, 0, -0.632] },
+      // Hind-left limb — splayed out to the left (rooted deep in the spine).
+      { type: 'capsule', args: [0.15, 1.43, 10, 16], pos: [-1.112, -0.462, 1.2], rot: [0, 0, 1.322] },
       // Hind-right limb — kicked down and to the right.
       { type: 'capsule', args: [0.15, 0.73, 10, 16], pos: [0.3, -1.325, -1.2], rot: [0, 0, -2.391] },
       // Front-left foot — three splayed toes.
