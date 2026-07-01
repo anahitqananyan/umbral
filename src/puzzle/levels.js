@@ -39,6 +39,48 @@ export const LEVELS = [
     ],
   },
   {
+    name: 'Teapot',
+    hint: 'It waits by the kettle to pour warmth into your cup.',
+    solveThreshold: 0.88,
+    startQuat: quat(1.0, 1.6, 1.1),
+    pieces: [
+      // Body — a wide, slightly squat ellipsoid: the round belly of the pot.
+      // (Z depths spread wide so it only resolves head-on and scatters otherwise.)
+      { type: 'sphere', args: [1.15, 30, 22], pos: [0.05, -0.1, 1.5], scale: [1.28, 1.0, 1.0] },
+      // Spout — a cone sweeping out and UP to the left: the unmistakable pour.
+      { type: 'cone', args: [0.34, 1.6], pos: [-1.5, 0.4, -1.5], rot: [0, 0, 0.95] },
+      // Handle — a ring on the RIGHT side (asymmetry with the spout defeats a flip).
+      { type: 'torus', args: [0.58, 0.13, 16, 36], pos: [1.4, 0.05, -1.7] },
+      // Lid — a low dome capping the body.
+      { type: 'sphere', args: [0.78, 26, 16], pos: [0.0, 1.05, 1.1], scale: [1.15, 0.5, 1.0] },
+      // Knob — the little handle on top of the lid.
+      { type: 'sphere', args: [0.22, 18, 14], pos: [0.0, 1.55, -1.3] },
+    ],
+  },
+  {
+    name: 'Angelfish',
+    hint: 'It hangs in the water like a paper kite — all fins and patience.',
+    solveThreshold: 0.88,
+    startQuat: quat(0.9, 1.7, 1.0),
+    pieces: [
+      // Body — a tall, laterally-flattened diamond: the angelfish's signature disc.
+      // (Z depths spread wide so it only resolves head-on and scatters otherwise.)
+      { type: 'sphere', args: [1.0, 30, 22], pos: [0.0, 0.0, 1.5], scale: [0.9, 1.5, 1.0] },
+      // Snout — a short cone tapering to the left (the fish faces left).
+      { type: 'cone', args: [0.55, 0.9], pos: [-1.15, -0.15, -1.4], rot: [0, 0, Math.PI / 2] },
+      // Dorsal fin — a tall triangle sweeping up and back.
+      { type: 'cone', args: [0.8, 2.6], pos: [0.5, 1.75, 1.1], rot: [0, 0, -0.55] },
+      // Anal fin — a large triangle sweeping down and back (mirror of the dorsal).
+      { type: 'cone', args: [0.85, 2.5], pos: [0.55, -1.75, -1.2], rot: [0, 0, Math.PI + 0.55] },
+      // Tail — a forked fan at the rear (two lobes, apex toward the body).
+      { type: 'cone', args: [0.5, 1.3], pos: [1.85, 0.45, 0.9], rot: [0, 0, Math.PI / 2 + 0.25] },
+      { type: 'cone', args: [0.5, 1.3], pos: [1.85, -0.45, -0.9], rot: [0, 0, Math.PI / 2 - 0.25] },
+      // Ventral filaments — the long thin fins trailing down from the belly.
+      { type: 'cylinder', args: [0.05, 0.05, 2.4], pos: [-0.45, -1.9, 0.7], rot: [0, 0, 0.12] },
+      { type: 'cylinder', args: [0.05, 0.05, 2.0], pos: [-0.2, -1.75, -0.9], rot: [0, 0, -0.05] },
+    ],
+  },
+  {
     name: 'Key',
     hint: 'It opens what was closed.',
     solveThreshold: 0.85,
