@@ -408,14 +408,14 @@ export const LEVELS = [
       { type: 'sphere', args: [0.62, 36, 26], pos: [0.0, 1.55, 1.2], scale: [1.25, 1.0, 1.0] },
       // Torso — the body, running down from the head to the hips.
       { type: 'capsule', args: [0.6, 1.3, 12, 20], pos: [0.0, 0.35, -1.1] },
-      // Front-left arm — upper arm, forearm, and a three-toed hand (up-left).
-      { type: 'capsule', args: [0.17, 0.544, 10, 16], pos: [-0.75, 1.525, 1.3], rot: [0, 0, 0.746] },
+      // Front-left arm — upper arm (rooted deep in the torso), forearm, three-toed hand (up-left).
+      { type: 'capsule', args: [0.18, 0.844, 10, 16], pos: [-0.65, 1.4, 1.3], rot: [0, 0, 0.727] },
       { type: 'capsule', args: [0.14, 0.144, 10, 16], pos: [-1.2, 2.0, -1.2], rot: [0, 0, 0.785] },
       { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [-1.415, 2.339, 1.4], rot: [0, 0, 0.329] },
       { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [-1.491, 2.291, -1.3], rot: [0, 0, 0.785] },
       { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [-1.538, 2.217, 1.3], rot: [0, 0, 1.229] },
-      // Front-right arm — upper arm, forearm, and a three-toed hand (up).
-      { type: 'capsule', args: [0.17, 0.412, 10, 16], pos: [0.375, 1.575, -1.3], rot: [0, 0, 0.067] },
+      // Front-right arm — upper arm (rooted deep in the torso), forearm, three-toed hand (up).
+      { type: 'capsule', args: [0.18, 0.651, 10, 16], pos: [0.275, 1.45, -1.3], rot: [0, 0, -0.149] },
       { type: 'capsule', args: [0.14, 0.181, 10, 16], pos: [0.4, 2.175, 1.2], rot: [0, 0, -0.219] },
       { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [0.541, 2.578, -1.4], rot: [0, 0, -0.471] },
       { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [0.45, 2.6, 1.3], rot: [0, 0, 0.0] },
@@ -435,52 +435,35 @@ export const LEVELS = [
     ],
   },
   {
-    name: 'House',
-    hint: 'Four walls that mean you are home.',
-    solveThreshold: 0.88,
-    startQuat: quat(1.4, 1.2, 0.6),
+    name: 'Dog',
+    hint: 'Loyal to the end — it waits by the door for you.',
+    solveThreshold: 0.84,
+    startQuat: quat(0.9, 1.6, 1.0),
     pieces: [
-      // Walls — a square box.
-      { type: 'box', args: [2.4, 2.0, 1.2], pos: [0.0, -0.6, 0.6] },
-      // Roof — a triangle.
-      { type: 'cone', args: [1.6, 1.3], pos: [0.0, 1.05, -1.3] },
-      // Chimney.
-      { type: 'box', args: [0.35, 0.7, 0.35], pos: [0.7, 1.4, 0.8] },
-    ],
-  },
-  {
-    name: 'Heart',
-    hint: 'It beats louder when you are near.',
-    solveThreshold: 0.89,
-    startQuat: quat(0.6, 1.9, 1.4),
-    pieces: [
-      // Two top lobes.
-      { type: 'sphere', args: [0.85, 24, 18], pos: [-0.7, 0.7, 1.3] },
-      { type: 'sphere', args: [0.85, 24, 18], pos: [0.7, 0.7, -1.3] },
-      // The point below — a downward triangle.
-      { type: 'cone', args: [1.7, 1.8], pos: [0.0, -0.4, 1.0], rot: [Math.PI, 0, 0] },
-    ],
-  },
-  {
-    name: 'Umbrella',
-    hint: 'It blooms only when the sky weeps.',
-    solveThreshold: 0.9,
-    startQuat: quat(1.0, 0.6, 2.0),
-    pieces: [
-      // Canopy — a wide, peaked dome with a flat lower edge.
-      { type: 'cone', args: [2.0, 1.2], pos: [0.0, 0.25, 1.2] },
-      // Finial — the little spike on top.
-      { type: 'cylinder', args: [0.06, 0.06, 0.5], pos: [0.0, 1.05, 1.2] },
-      // Scalloped hem — rib tips hanging from the canopy edge (the umbrella cue).
-      { type: 'cone', args: [0.5, 0.6], pos: [-1.4, -0.4, -1.0], rot: [Math.PI, 0, 0] },
-      { type: 'cone', args: [0.5, 0.6], pos: [-0.47, -0.4, 0.8], rot: [Math.PI, 0, 0] },
-      { type: 'cone', args: [0.5, 0.6], pos: [0.47, -0.4, -0.8], rot: [Math.PI, 0, 0] },
-      { type: 'cone', args: [0.5, 0.6], pos: [1.4, -0.4, 1.0], rot: [Math.PI, 0, 0] },
-      // Pole — runs up into the canopy.
-      { type: 'cylinder', args: [0.07, 0.07, 2.2], pos: [0.0, -0.6, -1.5] },
-      // Hooked handle — a J at the foot of the pole.
-      { type: 'capsule', args: [0.12, 0.5, 6, 12], pos: [-0.28, -1.7, 0.6], rot: [0, 0, Math.PI / 2] },
-      { type: 'capsule', args: [0.12, 0.45, 6, 12], pos: [-0.62, -1.42, 0.6] },
+      // A dog sitting on its haunches, facing right, head lifted to look up. Body
+      // is a couple of ellipsoids; everything else is capsules/cylinders. (Z depths
+      // spread wide so it only resolves head-on and scatters into noise otherwise.)
+      // Body — one big tilted ellipsoid: deep chest at the front, sloping back to
+      // the seated rear.
+      { type: 'sphere', args: [1.08, 44, 32], pos: [0.2, -0.3, -1.1], scale: [1.35, 1.05, 1.0], rot: [0, 0, 0.3] },
+      // Haunch — the rounded hindquarter resting on the ground at the lower left.
+      { type: 'sphere', args: [0.72, 40, 30], pos: [-0.574, -0.738, 1.2], scale: [1.2, 1.0, 1.0] },
+      // Neck — a tapered column, thick at the chest and narrowing up to the head.
+      { type: 'cylinder', args: [0.4, 0.55, 1.35, 24], pos: [1.16, 0.9, 1.0], rot: [0, 0, -0.29] },
+      // Head — a larger, rounder skull.
+      { type: 'sphere', args: [0.55, 40, 30], pos: [1.22, 1.72, 1.1], scale: [1.05, 0.98, 1.0] },
+      // Ear — a folded ear at the crown, angled up and back.
+      { type: 'cone', args: [0.27, 0.62, 20], pos: [1.0, 2.2, -1.0], rot: [0, 0, 0.5] },
+      // Muzzle — a longer snout tipped up and to the right (the dog looks up).
+      { type: 'capsule', args: [0.25, 0.66, 12, 18], pos: [1.82, 2.02, -1.0], rot: [0, 0, -0.95] },
+      // Front legs — a near/far pair of straight columns down to the front paws.
+      { type: 'cylinder', args: [0.197, 0.23, 1.968, 20], pos: [1.107, -0.82, 1.3] },
+      { type: 'cylinder', args: [0.197, 0.23, 1.968, 20], pos: [1.312, -0.82, -1.3] },
+      // Seated base — the flat ground contact under the folded rear legs.
+      { type: 'box', args: [1.15, 0.5, 0.6], pos: [0.0, -1.6, 1.0] },
+      // Tail — sweeping out to the left along the ground, curling up at the tip.
+      { type: 'capsule', args: [0.18, 0.64, 10, 16], pos: [-1.394, -1.025, -1.2], rot: [0, 0, 2.181] },
+      { type: 'capsule', args: [0.131, 0.233, 10, 16], pos: [-2.03, -1.21, 1.1], rot: [0, 0, 1.144] },
     ],
   },
   {
@@ -502,68 +485,6 @@ export const LEVELS = [
     ],
   },
   {
-    name: 'Cactus',
-    hint: 'It hoards the desert and dares you to hold it.',
-    solveThreshold: 0.91,
-    startQuat: quat(0.8, 2.0, 1.2),
-    pieces: [
-      // Central column.
-      { type: 'capsule', args: [0.55, 2.6, 6, 16], pos: [0.0, -0.2, 1.0] },
-      // Left arm — out, then up.
-      { type: 'capsule', args: [0.3, 0.7, 6, 12], pos: [-0.85, 0.0, -1.3], rot: [0, 0, Math.PI / 2] },
-      { type: 'capsule', args: [0.3, 0.9, 6, 12], pos: [-1.25, 0.6, -1.3] },
-      // Right arm (higher — asymmetry).
-      { type: 'capsule', args: [0.3, 0.6, 6, 12], pos: [0.8, 0.5, 1.4], rot: [0, 0, Math.PI / 2] },
-      { type: 'capsule', args: [0.3, 0.7, 6, 12], pos: [1.15, 1.05, 1.4] },
-    ],
-  },
-  {
-    name: 'Mug',
-    hint: 'It holds the reason you wake up.',
-    solveThreshold: 0.91,
-    startQuat: quat(1.1, 1.5, 0.9),
-    pieces: [
-      // Cup body.
-      { type: 'cylinder', args: [0.95, 0.95, 2.0], pos: [-0.2, 0.0, 1.3] },
-      // Handle — a ring on the side.
-      { type: 'torus', args: [0.55, 0.16], pos: [1.0, 0.0, -1.5] },
-    ],
-  },
-  {
-    name: 'Airplane',
-    hint: 'It trades the ground for a thin line of cloud.',
-    solveThreshold: 0.92,
-    startQuat: quat(0.9, 1.8, 1.3),
-    pieces: [
-      // Fuselage — laid along X with a rounded nose.
-      { type: 'capsule', args: [0.45, 2.8, 6, 16], pos: [0.0, 0.0, 1.4], rot: [0, 0, Math.PI / 2] },
-      // Wings — a span across the body.
-      { type: 'box', args: [0.9, 2.6, 0.3], pos: [0.1, 0.0, -1.6] },
-      // Tailplane — smaller span at the rear.
-      { type: 'box', args: [0.6, 1.4, 0.3], pos: [-1.5, 0.0, 0.7] },
-    ],
-  },
-  {
-    name: 'Flower',
-    hint: 'It turns its face to follow the sun.',
-    solveThreshold: 0.9,
-    startQuat: quat(1.2, 1.7, 0.5),
-    pieces: [
-      // Center.
-      { type: 'sphere', args: [0.55, 24, 18], pos: [0.0, 0.85, 1.0] },
-      // Five petals around the center (bottom left open for the stem).
-      { type: 'sphere', args: [0.5, 20, 16], pos: [0.0, 1.8, -1.0] },
-      { type: 'sphere', args: [0.5, 20, 16], pos: [0.82, 1.28, 1.2] },
-      { type: 'sphere', args: [0.5, 20, 16], pos: [0.82, 0.42, -1.2] },
-      { type: 'sphere', args: [0.5, 20, 16], pos: [-0.82, 1.28, 1.2] },
-      { type: 'sphere', args: [0.5, 20, 16], pos: [-0.82, 0.42, -1.2] },
-      // Stem.
-      { type: 'cylinder', args: [0.08, 0.08, 2.2], pos: [0.0, -0.9, 0.6] },
-      // Leaf.
-      { type: 'sphere', args: [0.4, 18, 14], pos: [0.55, -0.9, -0.8], scale: [1.7, 0.7, 1.0], rot: [0, 0, -0.5] },
-    ],
-  },
-  {
     name: 'Anchor',
     hint: 'It holds you steady when the tide pulls.',
     solveThreshold: 0.91,
@@ -578,34 +499,6 @@ export const LEVELS = [
       // Flukes — two arms sweeping out at the bottom.
       { type: 'capsule', args: [0.14, 1.0, 6, 12], pos: [-0.55, -1.0, -1.0], rot: [0, 0, 0.8] },
       { type: 'capsule', args: [0.14, 1.0, 6, 12], pos: [0.55, -1.0, 1.0], rot: [0, 0, -0.8] },
-    ],
-  },
-  {
-    name: 'Ice Cream',
-    hint: 'Sweet, and racing the warmth to melt.',
-    solveThreshold: 0.91,
-    startQuat: quat(1.0, 2.0, 0.9),
-    pieces: [
-      // Waffle cone — apex down.
-      { type: 'cone', args: [0.75, 2.0], pos: [0.0, -0.3, 1.0], rot: [Math.PI, 0, 0] },
-      // Scoops.
-      { type: 'sphere', args: [0.78, 24, 18], pos: [0.0, 0.85, -1.2] },
-      { type: 'sphere', args: [0.62, 22, 16], pos: [-0.3, 1.65, 1.1] },
-    ],
-  },
-  {
-    name: 'Hourglass',
-    hint: 'It says the same thing, upside down or not: time runs.',
-    solveThreshold: 0.92,
-    startQuat: quat(0.6, 1.1, 1.5),
-    pieces: [
-      // Upper bulb — a downward cone.
-      { type: 'cone', args: [1.0, 1.5], pos: [0.0, 0.75, 1.2], rot: [Math.PI, 0, 0] },
-      // Lower bulb — an upward cone meeting it at the pinch.
-      { type: 'cone', args: [1.0, 1.5], pos: [0.0, -0.75, -1.2] },
-      // Top and bottom caps.
-      { type: 'box', args: [2.3, 0.28, 1.0], pos: [0.0, 1.6, 0.8] },
-      { type: 'box', args: [2.3, 0.28, 1.0], pos: [0.0, -1.6, -0.8] },
     ],
   },
   {
