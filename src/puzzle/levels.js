@@ -348,43 +348,90 @@ export const LEVELS = [
     ],
   },
   {
-    name: 'Fish',
-    hint: 'It breathes the water it swims in.',
-    solveThreshold: 0.86,
-    startQuat: quat(0.9, 1.6, 0.8),
-    pieces: [
-      // Body — a wide ellipsoid.
-      { type: 'sphere', args: [1.1, 28, 20], pos: [-0.2, 0.0, 1.5], scale: [1.5, 1.0, 1.0] },
-      // Tail fin — a triangle fanning out behind (apex toward the body).
-      { type: 'cone', args: [0.9, 1.4], pos: [1.9, 0.0, -1.0], rot: [0, 0, Math.PI / 2] },
-      // Dorsal fin.
-      { type: 'cone', args: [0.4, 0.7], pos: [-0.3, 1.0, 0.8] },
-    ],
-  },
-  {
-    name: 'Mushroom',
-    hint: 'It rises overnight after the rain.',
-    solveThreshold: 0.86,
-    startQuat: quat(1.2, 0.9, 1.7),
-    pieces: [
-      // Cap — a wide, low dome.
-      { type: 'sphere', args: [1.5, 28, 18], pos: [0.0, 0.5, 1.4], scale: [1.3, 0.62, 1.0] },
-      // Stem — stout cylinder.
-      { type: 'cylinder', args: [0.5, 0.5, 1.8], pos: [0.0, -0.9, -1.5] },
-    ],
-  },
-  {
-    name: 'Pine Tree',
-    hint: 'It stays green while the rest let go.',
+    name: 'Christmas Tree',
+    hint: 'Its branches hold the lights, and gifts wait beneath.',
     solveThreshold: 0.88,
     startQuat: quat(0.7, 2.1, 1.1),
     pieces: [
-      // Lower tier of foliage.
-      { type: 'cone', args: [1.5, 1.8], pos: [0.0, -0.2, 1.2] },
-      // Upper tier.
-      { type: 'cone', args: [1.1, 1.6], pos: [0.0, 1.0, -1.4] },
-      // Trunk.
-      { type: 'cylinder', args: [0.35, 0.35, 1.2], pos: [0.0, -1.6, 0.6] },
+      // Stacked conical tiers narrowing to a point on a short trunk — each tier's
+      // wider base overhangs the one above for the layered branch look. (Z depths
+      // spread wide so it only resolves head-on and scatters otherwise.)
+      // Bottom tier — the widest skirt of branches.
+      { type: 'cone', args: [1.25, 1.0, 40], pos: [0.0, 0.0, -1.2] },
+      // Second tier.
+      { type: 'cone', args: [1.0, 0.95, 40], pos: [0.0, 0.475, 1.3] },
+      // Third tier.
+      { type: 'cone', args: [0.78, 0.9, 40], pos: [0.0, 0.9, -1.2] },
+      // Top tier — tapering to the crown.
+      { type: 'cone', args: [0.55, 1.0, 40], pos: [0.0, 1.35, 1.3] },
+      // Trunk — a short stump at the base.
+      { type: 'box', args: [0.42, 0.6, 0.45], pos: [0.0, -0.8, -1.0] },
+    ],
+  },
+  {
+    name: 'Airplane',
+    hint: 'Wings full of travelers, bound for a far city.',
+    solveThreshold: 0.86,
+    startQuat: quat(0.9, 1.8, 1.3),
+    pieces: [
+      // Side profile, nose to the left, tail sweeping up to the right. Built from
+      // a capsule fuselage plus cones/capsules (no spheres). (Z depths spread wide
+      // so it only resolves head-on and scatters into noise otherwise.)
+      // Fuselage — the long tube, its rounded rear cap giving the swept tail body.
+      { type: 'capsule', args: [0.59, 2.95, 12, 24], pos: [0.08, 0.29, -0.82], rot: [0, 0, Math.PI / 2] },
+      // Nose — a cone tapering to the left and slightly down.
+      { type: 'cone', args: [0.51, 1.07, 28], pos: [-2.13, 0.18, 1.1], rot: [0, 0, 1.77] },
+      // Nose fin — a thin vertical spar at the nose (the propeller/probe cross).
+      { type: 'capsule', args: [0.05, 0.57, 6, 12], pos: [-2.21, 0.2, -1.1] },
+      // Vertical tail fin — swept up and back to the right.
+      { type: 'cone', args: [0.45, 1.39, 28], pos: [1.64, 0.86, 1.1], rot: [0, 0, -0.6] },
+      // Horizontal stabilizer — a small tailplane sweeping off the rear.
+      { type: 'cone', args: [0.29, 0.82, 20], pos: [1.89, 0.57, -1.1], rot: [0, 0, -1.3] },
+      // Main wing — a large swept wing raking down to a tip at the lower left.
+      { type: 'cone', args: [0.7, 2.46, 28], pos: [-0.66, -0.82, 1.2], rot: [0, 0, 2.356] },
+      // Engine nacelles — two rounded pods slung under the belly.
+      { type: 'capsule', args: [0.21, 0.29, 8, 14], pos: [0.29, -0.41, 1.3], rot: [0, 0, Math.PI / 2] },
+      { type: 'capsule', args: [0.2, 0.26, 8, 14], pos: [0.78, -0.37, -1.3], rot: [0, 0, Math.PI / 2] },
+    ],
+  },
+  {
+    name: 'Frog',
+    hint: 'It leaps between lily pads and sings after the rain.',
+    solveThreshold: 0.8,
+    startQuat: quat(1.1, 1.7, 0.9),
+    pieces: [
+      // A splayed tree frog seen from above: head at the top, two front arms
+      // reaching up to fanned hands, two big folded hind legs with long toes
+      // pointing down. Built from tapering capsules (only the head is a sphere).
+      // (Z depths spread wide so it only resolves head-on and scatters otherwise.)
+      // Head — a wide rounded snout at the top.
+      { type: 'sphere', args: [0.62, 36, 26], pos: [0.0, 1.55, 1.2], scale: [1.25, 1.0, 1.0] },
+      // Torso — the body, running down from the head to the hips.
+      { type: 'capsule', args: [0.6, 1.3, 12, 20], pos: [0.0, 0.35, -1.1] },
+      // Front-left arm — upper arm, forearm, and a three-toed hand (up-left).
+      { type: 'capsule', args: [0.17, 0.544, 10, 16], pos: [-0.75, 1.525, 1.3], rot: [0, 0, 0.746] },
+      { type: 'capsule', args: [0.14, 0.144, 10, 16], pos: [-1.2, 2.0, -1.2], rot: [0, 0, 0.785] },
+      { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [-1.415, 2.339, 1.4], rot: [0, 0, 0.329] },
+      { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [-1.491, 2.291, -1.3], rot: [0, 0, 0.785] },
+      { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [-1.538, 2.217, 1.3], rot: [0, 0, 1.229] },
+      // Front-right arm — upper arm, forearm, and a three-toed hand (up).
+      { type: 'capsule', args: [0.17, 0.412, 10, 16], pos: [0.375, 1.575, -1.3], rot: [0, 0, 0.067] },
+      { type: 'capsule', args: [0.14, 0.181, 10, 16], pos: [0.4, 2.175, 1.2], rot: [0, 0, -0.219] },
+      { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [0.541, 2.578, -1.4], rot: [0, 0, -0.471] },
+      { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [0.45, 2.6, 1.3], rot: [0, 0, 0.0] },
+      { type: 'capsule', args: [0.06, 0.32, 8, 12], pos: [0.358, 2.577, -1.3], rot: [0, 0, 0.479] },
+      // Hind-left leg — thick thigh out to the side, shank, and long down-toes.
+      { type: 'capsule', args: [0.26, 0.745, 12, 18], pos: [-0.95, -0.05, 1.2], rot: [0, 0, 1.249] },
+      { type: 'capsule', args: [0.19, 1.097, 12, 18], pos: [-1.25, -0.525, -1.3], rot: [0, 0, -2.724] },
+      { type: 'capsule', args: [0.07, 0.5, 8, 12], pos: [-1.112, -1.476, 1.4], rot: [0, 0, 2.612] },
+      { type: 'capsule', args: [0.07, 0.5, 8, 12], pos: [-1.006, -1.515, -1.3], rot: [0, 0, 2.967] },
+      { type: 'capsule', args: [0.07, 0.5, 8, 12], pos: [-0.864, -1.508, 1.3], rot: [0, 0, -2.871] },
+      // Hind-right leg — thick thigh out to the side, shank, and long down-toes.
+      { type: 'capsule', args: [0.27, 0.944, 12, 18], pos: [0.975, 0.15, -1.2], rot: [0, 0, -1.001] },
+      { type: 'capsule', args: [0.19, 1.329, 12, 18], pos: [1.3, -0.25, 1.3], rot: [0, 0, 2.783] },
+      { type: 'capsule', args: [0.07, 0.5, 8, 12], pos: [0.787, -1.289, -1.4], rot: [0, 0, 2.412] },
+      { type: 'capsule', args: [0.07, 0.5, 8, 12], pos: [0.897, -1.353, 1.3], rot: [0, 0, 2.812] },
+      { type: 'capsule', args: [0.07, 0.5, 8, 12], pos: [1.023, -1.369, -1.3], rot: [0, 0, -3.071] },
     ],
   },
   {
@@ -562,22 +609,51 @@ export const LEVELS = [
     ],
   },
   {
-    name: 'Bird',
-    hint: 'It owns the morning before anyone wakes.',
-    solveThreshold: 0.93,
-    startQuat: quat(1.3, 0.8, 1.1),
+    name: 'Gecko',
+    hint: 'It scales sheer walls on toes that never slip.',
+    solveThreshold: 0.8,
+    startQuat: quat(0.9, 1.6, 1.2),
     pieces: [
-      // Body.
-      { type: 'sphere', args: [0.9, 26, 18], pos: [-0.1, 0.0, 1.0], scale: [1.3, 1.0, 1.0] },
-      // Head.
-      { type: 'sphere', args: [0.55, 22, 16], pos: [1.0, 0.75, -1.1] },
-      // Beak — a small cone pointing forward.
-      { type: 'cone', args: [0.22, 0.65], pos: [1.7, 0.7, -1.1], rot: [0, 0, -Math.PI / 2] },
-      // Tail — a fan sweeping back.
-      { type: 'cone', args: [0.5, 1.1], pos: [-1.0, 0.05, 1.2], rot: [0, 0, -Math.PI / 2] },
-      // Legs.
-      { type: 'capsule', args: [0.07, 0.55, 6, 10], pos: [0.1, -1.05, 0.8] },
-      { type: 'capsule', args: [0.07, 0.55, 6, 10], pos: [0.5, -1.05, 0.8] },
+      // A climbing gecko: an S-curved body from the snout (upper-left) down to the
+      // hips, a long tail sweeping up and around to the right, and four limbs
+      // splayed to fan-toed feet. Built from tapering capsules (no spheres) so the
+      // limbs and tail stay clean. (Z depths spread wide so it only resolves
+      // head-on and scatters into noise otherwise.)
+      // Spine — snout, neck, fore-body, hips.
+      { type: 'capsule', args: [0.28, 0.32, 10, 16], pos: [-1.7, 1.275, 1.4], rot: [0, 0, -2.486] },
+      { type: 'capsule', args: [0.29, 0.28, 10, 16], pos: [-1.2, 0.6, -1.3], rot: [0, 0, -2.521] },
+      { type: 'capsule', args: [0.31, 0.21, 10, 16], pos: [-0.725, -0.1, 1.2], rot: [0, 0, -2.57] },
+      { type: 'capsule', args: [0.3, 0.12, 10, 16], pos: [-0.275, -0.675, -1.4], rot: [0, 0, -2.356] },
+      // Tail — a long arc sweeping up and to the right, tapering to a thin tip.
+      { type: 'capsule', args: [0.27, 0.13, 10, 16], pos: [0.25, -0.75, 1.3], rot: [0, 0, -1.107] },
+      { type: 'capsule', args: [0.23, 0.35, 10, 16], pos: [0.85, -0.325, -1.2], rot: [0, 0, -0.828] },
+      { type: 'capsule', args: [0.19, 0.5, 10, 16], pos: [1.375, 0.325, 1.5], rot: [0, 0, -0.541] },
+      { type: 'capsule', args: [0.145, 0.535, 10, 16], pos: [1.7, 1.1, -1.3], rot: [0, 0, -0.245] },
+      { type: 'capsule', args: [0.095, 0.517, 10, 16], pos: [1.75, 1.85, 1.4], rot: [0, 0, 0.142] },
+      // Front-left limb — reaching up and to the left.
+      { type: 'capsule', args: [0.15, 0.94, 10, 16], pos: [-1.675, 0.95, 1.5], rot: [0, 0, 0.87] },
+      // Front-right limb — reaching up and to the right.
+      { type: 'capsule', args: [0.15, 0.87, 10, 16], pos: [-0.375, 0.55, -1.5], rot: [0, 0, -0.815] },
+      // Hind-left limb — splayed out to the left.
+      { type: 'capsule', args: [0.15, 1.19, 10, 16], pos: [-1.225, -0.425, 1.2], rot: [0, 0, 1.331] },
+      // Hind-right limb — kicked down and to the right.
+      { type: 'capsule', args: [0.15, 0.73, 10, 16], pos: [0.3, -1.325, -1.2], rot: [0, 0, -2.391] },
+      // Front-left foot — three splayed toes.
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.202, 1.522, 1.4], rot: [0, 0, 0.289] },
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.277, 1.477, -1.3], rot: [0, 0, 0.789] },
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.323, 1.399, 1.3], rot: [0, 0, 1.289] },
+      // Front-right foot.
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.208, 1.036, -1.4], rot: [0, 0, -1.071] },
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.147, 1.101, 1.3], rot: [0, 0, -0.571] },
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.063, 1.129, -1.3], rot: [0, 0, -0.071] },
+      // Hind-left foot.
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.107, -0.163, 1.4], rot: [0, 0, 1.069] },
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.13, -0.25, -1.3], rot: [0, 0, 1.569] },
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.107, -0.337, 1.3], rot: [0, 0, 2.069] },
+      // Hind-right foot.
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.645, -1.88, -1.4], rot: [0, 0, -3.171] },
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.732, -1.86, 1.3], rot: [0, 0, -2.671] },
+      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.799, -1.802, -1.3], rot: [0, 0, -2.171] },
     ],
   },
 ];
