@@ -485,20 +485,26 @@ export const LEVELS = [
     ],
   },
   {
-    name: 'Anchor',
-    hint: 'It holds you steady when the tide pulls.',
-    solveThreshold: 0.91,
-    startQuat: quat(0.7, 1.4, 1.8),
+    name: 'Truck',
+    hint: 'It hauls the parcels from door to distant door.',
+    solveThreshold: 0.87,
+    startQuat: quat(0.9, 1.7, 1.1),
     pieces: [
-      // Ring at the top.
-      { type: 'torus', args: [0.42, 0.13], pos: [0.0, 1.65, 1.0] },
-      // Shaft.
-      { type: 'cylinder', args: [0.15, 0.15, 2.9], pos: [0.0, 0.05, -1.3] },
-      // Stock (the crossbar near the top).
-      { type: 'capsule', args: [0.12, 1.5, 6, 12], pos: [0.0, 0.85, 1.2], rot: [0, 0, Math.PI / 2] },
-      // Flukes — two arms sweeping out at the bottom.
-      { type: 'capsule', args: [0.14, 1.0, 6, 12], pos: [-0.55, -1.0, -1.0], rot: [0, 0, 0.8] },
-      { type: 'capsule', args: [0.14, 1.0, 6, 12], pos: [0.55, -1.0, 1.0], rot: [0, 0, -0.8] },
+      // A box (delivery) truck facing left: tall cargo box on the right, a shorter
+      // cab with a sloped windshield on the left, two disc wheels below. (Z depths
+      // spread wide so it only resolves head-on and scatters into noise otherwise.)
+      // Cargo box — the big rectangular container.
+      { type: 'box', args: [2.5, 1.9, 1.0], pos: [0.85, 0.45, -1.0] },
+      // Cab — the shorter driver's box at the front.
+      { type: 'box', args: [1.3, 1.4, 1.0], pos: [-1.0, 0.15, 1.1] },
+      // Nose — a tilted block giving the sloped windshield / hood at the front.
+      { type: 'box', args: [0.7, 1.15, 1.0], pos: [-1.55, 0.0, 1.2], rot: [0, 0, -0.25] },
+      // Chassis — the underbody bar bridging cab and cargo, with clearance below.
+      { type: 'box', args: [3.8, 0.5, 1.0], pos: [0.2, -0.55, -1.0] },
+      // Front wheel — a disc under the cab.
+      { type: 'cylinder', args: [0.52, 0.52, 0.62, 32], pos: [-1.0, -0.95, 1.3], rot: [Math.PI / 2, 0, 0] },
+      // Rear wheel — a disc under the cargo box.
+      { type: 'cylinder', args: [0.56, 0.56, 0.62, 32], pos: [1.15, -0.95, -1.3], rot: [Math.PI / 2, 0, 0] },
     ],
   },
   {
