@@ -16,6 +16,10 @@ export class HUD {
     this.onToggleSound = null;
     this.soundBtn.onclick = () => this.onToggleSound?.();
 
+    // "Reset?" nudge shown once every level is cleared — opens Settings on click.
+    this.resetToast = document.getElementById('reset-toast');
+    this.resetToast.onclick = () => this.onOpenSettings?.();
+
     this.mainMenu = document.getElementById('main-menu');
     this.playBtn = document.getElementById('play-btn');
 
@@ -261,6 +265,14 @@ export class HUD {
 
   setSoundMuted(muted) {
     this.soundBtn.textContent = muted ? '🔇 Sound: Off' : '🔊 Sound: On';
+  }
+
+  showResetSuggestion() {
+    this.resetToast.classList.add('show');
+  }
+
+  hideResetSuggestion() {
+    this.resetToast.classList.remove('show');
   }
 
   hideLoading() {

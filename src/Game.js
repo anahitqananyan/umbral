@@ -88,9 +88,11 @@ export class Game {
     clearTimeout(this._winTimer);
     this.selecting = true;
     this.won = false;
+    this.snapping = false;
     this.arcball.setEnabled(false);
     this.hud.hideDragHint();
     this.hud.hideWin();
+    this.hud.hideResetSuggestion();
     this.hud.hideLevelSelect();
     this.hud.showMainMenu();
   }
@@ -157,11 +159,15 @@ export class Game {
     clearTimeout(this._winTimer);
     this.selecting = true;
     this.won = false;
+    this.snapping = false; // cancel any in-flight snap so it can't re-fire a win
     this.arcball.setEnabled(false);
     this.hud.hideDragHint();
     this.hud.hideWin();
     this._refreshLevelSelect();
     this.hud.showLevelSelect();
+    // Once every shadow is cleared, gently suggest resetting progress.
+    if (this.completed.size >= LEVELS.length) this.hud.showResetSuggestion();
+    else this.hud.hideResetSuggestion();
   }
 
   // Bake a black silhouette figure for every level once — each is that puzzle's
@@ -203,6 +209,7 @@ export class Game {
     this.completed = new Set();
     this._saveProgress();
     this._refreshLevelSelect(); // relock the grid behind the settings panel
+    this.hud.hideResetSuggestion(); // nothing cleared anymore
     this.hud.setSettingsProgress(this._progressText());
     this.hud.hideSettings();
   }
@@ -216,6 +223,8 @@ export class Game {
     }
 
     clearTimeout(this._winTimer);
+    this.hud.hideWin(); // never carry a stale win card into a freshly-loaded level
+    this.hud.hideResetSuggestion();
     const level = LEVELS[index];
     this.levelIndex = index;
     this.won = false;
@@ -306,8 +315,10 @@ export class Game {
       this.hud.setProximity(this.matcher.proximity);
 
       // Solve detected → glide to the exact solution pose, then show the win.
-      if (this.matcher.solved && !this.won && !this.snapping) this._beginSnap();
-      if (this.snapping) this._updateSnap(dt);
+      // Gated on !selecting so a still-"solved" matcher can't re-fire the win
+      // after we've navigated back to a menu/level-select.
+      if (this.matcher.solved && !this.won && !this.snapping && !this.selecting) this._beginSnap();
+      if (this.snapping && !this.selecting) this._updateSnap(dt);
 
       // gentle camera sway
       this.swayT += dt;

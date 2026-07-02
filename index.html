@@ -252,8 +252,8 @@
         width: 100%;
         height: 100%;
       }
-      /* Level tiles: glowing white 3D blocks placed on the oval track. The stacked
-         box-shadows fake the block's side thickness; the orange shadow grounds it. */
+      /* Level tiles: glowing orange 3D blocks placed on the oval track. The stacked
+         box-shadows fake the block's side thickness; a soft white glow sits beneath. */
       .ls-card {
         position: absolute;
         width: 108px;
@@ -269,30 +269,30 @@
         border: none;
         border-radius: 15px;
         cursor: pointer;
-        color: #2a1e06;
+        color: #3a2306;
         font-family: inherit;
         text-align: center;
-        background: linear-gradient(158deg, #ffffff 0%, #eef0f3 46%, #cfd3da 100%);
+        background: linear-gradient(158deg, #ffd9a8 0%, #f4ad5b 46%, #db8a34 100%);
         box-shadow:
-          0 5px 0 #b7bbc4,                      /* block side (thickness) */
-          0 10px 0 #969aa5,                     /* deeper side */
-          0 16px 22px rgba(196, 104, 28, 0.42), /* slightly orange cast shadow */
-          inset 0 2px 4px rgba(255, 255, 255, 0.95), /* top-face highlight */
-          inset 0 -3px 8px rgba(150, 156, 168, 0.4);  /* inner lower shade */
+          0 5px 0 #bd7a2c,                      /* orange block side (thickness) */
+          0 10px 0 #9c611e,                     /* deeper side */
+          0 16px 24px rgba(255, 255, 255, 0.32), /* soft white glow beneath */
+          inset 0 2px 4px rgba(255, 245, 225, 0.9), /* top-face highlight */
+          inset 0 -3px 8px rgba(150, 90, 30, 0.4);  /* inner lower shade */
         transform: translateY(0);
         transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
         z-index: 2;
       }
       .ls-card:hover {
         transform: translateY(-6px);
-        filter: brightness(1.04);
+        filter: brightness(1.05);
         box-shadow:
-          0 7px 0 #b7bbc4,
-          0 13px 0 #969aa5,
-          0 24px 30px rgba(196, 104, 28, 0.5), /* slightly orange cast shadow */
-          0 0 26px rgba(216, 180, 106, 0.45),  /* warm glow */
-          inset 0 2px 4px rgba(255, 255, 255, 0.95),
-          inset 0 -3px 8px rgba(150, 156, 168, 0.4);
+          0 7px 0 #bd7a2c,
+          0 13px 0 #9c611e,
+          0 24px 32px rgba(255, 255, 255, 0.4), /* soft white glow beneath */
+          0 0 26px rgba(255, 255, 255, 0.45),   /* white halo */
+          inset 0 2px 4px rgba(255, 245, 225, 0.9),
+          inset 0 -3px 8px rgba(150, 90, 30, 0.4);
       }
       .ls-card:active { transform: translateY(-1px); } /* press the block down */
       /* The single diamond-shaped level (the hub the two lines start from). Its
@@ -302,23 +302,23 @@
       .ls-diamond {
         background: transparent;
         box-shadow: none;
-        filter: drop-shadow(0 9px 10px rgba(196, 104, 28, 0.5));
+        filter: drop-shadow(0 9px 10px rgba(255, 255, 255, 0.35)); /* white glow beneath */
       }
       .ls-diamond::before {
         content: '';
         position: absolute;
         inset: 0; /* face fills the block so the diamond matches the squares' size */
-        background: linear-gradient(158deg, #ffffff 0%, #eef0f3 46%, #cfd3da 100%);
+        background: linear-gradient(158deg, #ffd9a8 0%, #f4ad5b 46%, #db8a34 100%);
         border-radius: 15px;
         transform: rotate(45deg);
         box-shadow:
-          inset 0 2px 4px rgba(255, 255, 255, 0.95),
-          inset 0 -3px 8px rgba(150, 156, 168, 0.4);
+          inset 0 2px 4px rgba(255, 245, 225, 0.9),
+          inset 0 -3px 8px rgba(150, 90, 30, 0.4);
         z-index: -1;
       }
       .ls-diamond:hover {
         box-shadow: none;
-        filter: drop-shadow(0 13px 14px rgba(196, 104, 28, 0.6)) brightness(1.04);
+        filter: drop-shadow(0 13px 14px rgba(255, 255, 255, 0.5)) brightness(1.04);
       }
       .ls-diamond .ls-fig { width: 64%; height: 64%; }
       /* The oval ring the branch levels sit on (drawn as a dashed SVG ellipse). */
@@ -404,17 +404,17 @@
       }
       .ls-card .nm { font-size: 22px; font-weight: 600; letter-spacing: 0.02em; color: #241a04; }
 
-      /* Locked — same white block, but non-interactive (no hover lift). */
+      /* Locked — same orange block, but non-interactive (no hover lift). */
       .ls-card.locked { cursor: not-allowed; }
       .ls-card.locked:hover {
         transform: none;
         filter: none;
         box-shadow:
-          0 5px 0 #b7bbc4,
-          0 11px 0 #969aa5,
-          0 18px 24px rgba(196, 104, 28, 0.42), /* slightly orange cast shadow */
-          inset 0 2px 4px rgba(255, 255, 255, 0.95),
-          inset 0 -3px 8px rgba(150, 156, 168, 0.4);
+          0 5px 0 #bd7a2c,
+          0 10px 0 #9c611e,
+          0 16px 24px rgba(255, 255, 255, 0.32), /* soft white glow beneath */
+          inset 0 2px 4px rgba(255, 245, 225, 0.9),
+          inset 0 -3px 8px rgba(150, 90, 30, 0.4);
       }
 
       /* open-settings button on the level-select page */
@@ -433,6 +433,29 @@
         transition: color 0.2s ease, border-color 0.2s ease;
       }
       .ls-settings-btn:hover { color: var(--ink); border-color: rgba(216, 180, 106, 0.5); }
+
+      /* Little "reset?" nudge, top-right, shown only once every level is cleared. */
+      .reset-toast {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 70;
+        padding: 7px 14px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--ink);
+        background: rgba(20, 20, 26, 0.9);
+        border: 1px solid rgba(216, 180, 106, 0.45);
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: inherit;
+        opacity: 0;
+        transform: translateY(-6px);
+        pointer-events: none;
+        transition: opacity 0.35s ease, transform 0.35s ease, border-color 0.2s ease;
+      }
+      .reset-toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+      .reset-toast:hover { border-color: rgba(216, 180, 106, 0.85); }
 
       /* ---- settings ---- */
       #settings {
@@ -620,6 +643,8 @@
         <div class="ls-grid" id="level-grid"></div>
       </div>
     </div>
+
+    <button id="reset-toast" class="reset-toast">✦ All shadows cleared — reset?</button>
 
     <div id="settings">
       <div class="settings-card">
