@@ -8,6 +8,7 @@ import { buildObject } from './puzzle/ObjectBuilder.js';
 import { Matcher } from './puzzle/Matcher.js';
 import { Arcball } from './controls/Arcball.js';
 import { HUD } from './ui/HUD.js';
+import { Ambient } from './audio/Ambient.js';
 import { createDebug } from './util/debug.js';
 
 export class Game {
@@ -24,6 +25,7 @@ export class Game {
     this.matcher = new Matcher(this.renderer);
     this.arcball = new Arcball(this.renderer.domElement);
     this.hud = new HUD();
+    this.ambient = new Ambient();
 
     this.clock = new THREE.Clock();
     this.levelIndex = 0;
@@ -46,7 +48,17 @@ export class Game {
 
     this.debug = createDebug(this.matcher);
 
-    this.arcball.onFirstInteraction = () => this.hud.hideDragHint();
+    this.arcball.onFirstInteraction = () => {
+      this.ambient.start(); // a gesture — safe to begin/resume audio
+      this.hud.hideDragHint();
+    };
+
+    // Sound toggle (the ambient score). Clicking it also counts as the gesture
+    // that lets the audio context start.
+    this.hud.onToggleSound = () => {
+      this.ambient.start();
+      this.hud.setSoundMuted(this.ambient.toggleMute());
+    };
 
     window.addEventListener('resize', () => this._onResize());
 
@@ -61,6 +73,7 @@ export class Game {
     };
     this.hud.onResetProgress = () => this.resetProgress();
     this.hud.onPlay = () => {
+      this.ambient.start(); // begin the score on the first click (audio needs a gesture)
       this.hud.hideMainMenu();
       this.openLevelSelect();
     };
@@ -72,6 +85,7 @@ export class Game {
   }
 
   openMainMenu() {
+    clearTimeout(this._winTimer);
     this.selecting = true;
     this.won = false;
     this.arcball.setEnabled(false);
@@ -81,8 +95,35 @@ export class Game {
     this.hud.showMainMenu();
   }
 
+  // Branching progression: a straight stem 0..CUPID, then the middle levels
+  // split into a top arc and a bottom arc (both open at once), converging on the
+  // final level. Kept in sync with the layout in HUD.renderLevelSelect.
+  _branchInfo() {
+    const total = LEVELS.length;
+    const CUPID = 4;
+    const MERGE = total - 1;
+    const middle = [];
+    for (let i = CUPID + 1; i < MERGE; i++) middle.push(i);
+    const half = Math.ceil(middle.length / 2);
+    return {
+      CUPID,
+      MERGE,
+      topStart: middle[0],
+      botStart: middle[half],
+      topEnd: middle[half - 1],
+      botEnd: middle[middle.length - 1],
+    };
+  }
+
   _isUnlocked(index) {
-    return index === 0 || this.completed.has(index - 1);
+    if (index === 0) return true;
+    const { CUPID, MERGE, topStart, botStart, topEnd, botEnd } = this._branchInfo();
+    // Both branches open once Cupid is cleared.
+    if (index === topStart || index === botStart) return this.completed.has(CUPID);
+    // The final level needs BOTH branches finished (the loop closes on it).
+    if (index === MERGE) return this.completed.has(topEnd) && this.completed.has(botEnd);
+    // Everything else advances from its immediate predecessor.
+    return this.completed.has(index - 1);
   }
 
   _loadProgress() {
@@ -113,6 +154,7 @@ export class Game {
   }
 
   openLevelSelect() {
+    clearTimeout(this._winTimer);
     this.selecting = true;
     this.won = false;
     this.arcball.setEnabled(false);
@@ -173,6 +215,7 @@ export class Game {
       });
     }
 
+    clearTimeout(this._winTimer);
     const level = LEVELS[index];
     this.levelIndex = index;
     this.won = false;
@@ -193,9 +236,17 @@ export class Game {
   }
 
   _nextLevel() {
-    const next = (this.levelIndex + 1) % LEVELS.length;
-    // The just-cleared level unlocks the next, so this is always allowed.
-    this.selectLevel(next);
+    // With the branch, index+1 isn't always the right "next", so walk forward to
+    // the next unlocked, not-yet-cleared level; if none remain, show the map.
+    const total = LEVELS.length;
+    for (let step = 1; step <= total; step++) {
+      const idx = (this.levelIndex + step) % total;
+      if (!this.completed.has(idx) && this._isUnlocked(idx)) {
+        this.selectLevel(idx);
+        return;
+      }
+    }
+    this.openLevelSelect();
   }
 
   _onResize() {
@@ -234,11 +285,15 @@ export class Game {
   _handleWin() {
     this.won = true;
     this.arcball.setEnabled(false);
+    this.ambient.playWin(); // success chime
     this.completed.add(this.levelIndex); // unlocks the next level
     this._saveProgress();
     const name = LEVELS[this.levelIndex].name;
     this.hud.hideDragHint();
-    this.hud.showWin(name, () => this._nextLevel(), () => this.openLevelSelect());
+    this.hud.showWin(name);
+    // After a brief celebration, return to the level map automatically.
+    clearTimeout(this._winTimer);
+    this._winTimer = setTimeout(() => this.openLevelSelect(), 1900);
   }
 
   start() {

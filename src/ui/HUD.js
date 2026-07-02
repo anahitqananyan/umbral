@@ -9,9 +9,12 @@ export class HUD {
     this.dragHint = document.getElementById('drag-hint');
     this.win = document.getElementById('win');
     this.winName = document.getElementById('win-name');
-    this.nextBtn = document.getElementById('next-btn');
-    this.selectBtn = document.getElementById('select-btn');
     this.loading = document.getElementById('loading');
+
+    // Sound (ambient score) toggle.
+    this.soundBtn = document.getElementById('sound-btn');
+    this.onToggleSound = null;
+    this.soundBtn.onclick = () => this.onToggleSound?.();
 
     this.mainMenu = document.getElementById('main-menu');
     this.playBtn = document.getElementById('play-btn');
@@ -66,17 +69,9 @@ export class HUD {
     this.dragHint.classList.remove('show');
   }
 
-  showWin(name, onNext, onSelect) {
+  showWin(name) {
     this.winName.textContent = name;
     this.win.classList.add('show');
-    this.nextBtn.onclick = () => {
-      this.hideWin();
-      onNext?.();
-    };
-    this.selectBtn.onclick = () => {
-      this.hideWin();
-      onSelect?.();
-    };
   }
 
   hideWin() {
@@ -91,47 +86,83 @@ export class HUD {
     const host = this.levelGrid;
     host.innerHTML = '';
 
-    // Layout: the first level is a diamond "hub" at the left; the remaining
-    // levels split into a top straight line and a bottom straight line, both
-    // running to the right and starting from the diamond. The host fills a
-    // fixed-aspect box, so everything is placed in its pixel space.
+    // Layout: a straight stem runs from the first level up to Cupid (index 4);
+    // after Cupid the path splits into a top arc and a bottom arc (both playable)
+    // that curve out and reconnect at the final level — a stem + oval loop. The
+    // host fills a fixed-aspect box, so everything is placed in its pixel space.
     const rect = host.getBoundingClientRect();
-    const W = rect.width || 1120;
-    const H = rect.height || 560;
+    const W = rect.width || 1180;
+    const H = rect.height || 620;
     const cy = H / 2;
     const n = items.length;
     if (n === 0) return;
 
     // Block footprint — keep in sync with .ls-card in index.html.
-    const bw = 96;
-    const bh = 90;
+    const bw = 108;
+    const bh = 102;
 
-    const diamondX = 44 + bw / 2;
-    const rowStartX = diamondX + 124; // first block of each line, right of the diamond
-    const rowEndX = W - (bw / 2 + 22);
-    const rowOffset = bh / 2 + 120; // vertical distance of each line from the centre (lines set well apart)
-    const topY = cy - rowOffset;
-    const botY = cy + rowOffset;
+    // Branch structure (kept in sync with Game._branchInfo): stem 0..CUPID, then
+    // the middle levels split into TOP and BOT arcs, converging on MERGE (last).
+    const CUPID = 4;
+    const MERGE = n - 1;
+    const middle = [];
+    for (let i = CUPID + 1; i < MERGE; i++) middle.push(i);
+    const half = Math.ceil(middle.length / 2);
+    const TOP = middle.slice(0, half);
+    const BOT = middle.slice(half);
 
-    const rest = n - 1;
-    const topCount = Math.ceil(rest / 2);
-    const botCount = rest - topCount;
-    const cols = Math.max(topCount, botCount, 2);
-    const dx = (rowEndX - rowStartX) / (cols - 1);
+    const xStart = 70;
+    const xCupid = W * 0.4; // stem ends here (the diamond)
+    const xOvalLeft = W * 0.48; // the oval begins just past the diamond
+    const xMerge = W - 60; // the oval's right vertex = the final level
+    const ovalCx = (xOvalLeft + xMerge) / 2;
+    const ovalRx = (xMerge - xOvalLeft) / 2;
+    const ovalRy = Math.min(H * 0.36, cy - bh / 2 - 14); // wide oval (rx > ry)
 
-    // Point per level index: [0] = diamond; [1..topCount] = top line;
-    // [topCount+1 ..] = bottom line.
     const pts = new Array(n);
-    pts[0] = [diamondX, cy];
-    for (let j = 0; j < topCount; j++) pts[1 + j] = [rowStartX + j * dx, topY];
-    for (let j = 0; j < botCount; j++) pts[1 + topCount + j] = [rowStartX + j * dx, botY];
+    // Stem 0..CUPID along the centre line.
+    for (let i = 0; i <= CUPID; i++) pts[i] = [xStart + (xCupid - xStart) * (i / CUPID), cy];
 
-    // Connectors: diamond → first of each line, then along each line.
+    // The branch levels sit evenly around a full oval. Going clockwise from just
+    // above the left (where the diamond links in): the top arc rises to the right
+    // vertex (the final, MERGE), then the bottom arc returns — so both branch ends
+    // flank MERGE and both branch starts flank the diamond's entry gap on the left.
+    const order = [...TOP, MERGE, ...[...BOT].reverse()];
+    const gap = 0.7; // radians of empty arc at the left, for the diamond entry
+    const span = 2 * Math.PI - gap;
+    order.forEach((idx, p) => {
+      const theta = Math.PI + gap / 2 + span * (p / (order.length - 1));
+      pts[idx] = [ovalCx + ovalRx * Math.cos(theta), cy + ovalRy * Math.sin(theta)];
+    });
+
+    // Draw the oval itself as a dashed ring (an SVG ellipse, so it's smooth) and
+    // the straight dashed links: the stem, and the diamond forking to each branch
+    // start. The ring itself connects all the levels sitting on it.
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'ls-svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('width', W);
+    svg.setAttribute('height', H);
+    // Draw the ring as an arc that stops at each branch start (open on the left),
+    // so there's no line closing across the entry gap between the two starts
+    // (Pawn ↔ Christmas Tree). Runs the long way round through the far vertex.
+    const [sx, sy] = pts[TOP[0]];
+    const [ex, ey] = pts[BOT[0]];
+    const ring = document.createElementNS(svgNS, 'path');
+    ring.setAttribute('d', `M ${sx} ${sy} A ${ovalRx} ${ovalRy} 0 1 1 ${ex} ${ey}`);
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', '#ffffff');
+    ring.setAttribute('stroke-width', '4');
+    ring.setAttribute('stroke-dasharray', '7 12');
+    ring.setAttribute('opacity', '0.8');
+    svg.appendChild(ring);
+    host.appendChild(svg);
+
     const links = [];
-    if (topCount > 0) links.push([0, 1]);
-    if (botCount > 0) links.push([0, 1 + topCount]);
-    for (let j = 1; j < topCount; j++) links.push([j, j + 1]);
-    for (let j = 0; j < botCount - 1; j++) links.push([1 + topCount + j, 1 + topCount + j + 1]);
+    for (let i = 0; i < CUPID; i++) links.push([i, i + 1]); // stem
+    if (TOP.length) links.push([CUPID, TOP[0]]); // diamond → top branch start
+    if (BOT.length) links.push([CUPID, BOT[0]]); // diamond → bottom branch start
 
     for (const [ai, bi] of links) {
       const [x1, y1] = pts[ai];
@@ -150,15 +181,30 @@ export class HUD {
       const [x, y] = pts[i];
       const card = document.createElement('button');
       card.className = 'ls-card';
-      if (i === 0) card.classList.add('ls-diamond'); // the hub
+      if (i === CUPID) card.classList.add('ls-diamond'); // the split junction
       if (it.locked) card.classList.add('locked');
       if (it.completed) card.classList.add('done');
       card.style.left = `${x}px`;
       card.style.top = `${y}px`;
 
-      // Each unlocked block shows the level's silhouette — that puzzle's own
-      // solved shadow. Locked levels stay blank so the shape remains a mystery.
-      if (it.icon && !it.locked) {
+      // A level shows its silhouette (that puzzle's own solved shadow) only once
+      // it's been cleared. Until then — whether unreachable or just not-yet-passed
+      // — it shows a padlock, so the shape stays a mystery until you solve it.
+      if (!it.completed) {
+        const NS = 'http://www.w3.org/2000/svg';
+        const lock = document.createElementNS(NS, 'svg');
+        lock.setAttribute('class', 'ls-lock');
+        lock.setAttribute('viewBox', '0 0 24 24');
+        const path = document.createElementNS(NS, 'path');
+        path.setAttribute('fill', '#1a1a1a');
+        path.setAttribute('fill-rule', 'evenodd');
+        path.setAttribute(
+          'd',
+          'M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z'
+        );
+        lock.appendChild(path);
+        card.appendChild(lock);
+      } else if (it.icon) {
         const fig = document.createElement('img');
         fig.className = 'ls-fig';
         fig.src = it.icon;
@@ -167,8 +213,8 @@ export class HUD {
         card.appendChild(fig);
       }
 
-      // The object's name, revealed as a tooltip on hover (unlocked levels only).
-      if (it.name && !it.locked) {
+      // The object's name is revealed (on hover) only once the level is cleared.
+      if (it.name && it.completed) {
         const label = document.createElement('span');
         label.className = 'ls-name';
         label.textContent = it.name;
@@ -211,6 +257,10 @@ export class HUD {
 
   hideSettings() {
     this.settings.classList.remove('show');
+  }
+
+  setSoundMuted(muted) {
+    this.soundBtn.textContent = muted ? '🔇 Sound: Off' : '🔊 Sound: On';
   }
 
   hideLoading() {
