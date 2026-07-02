@@ -95,12 +95,7 @@ export class HUD {
       if (it.locked) card.classList.add('locked');
       if (it.completed) card.classList.add('done');
 
-      const icon = it.locked ? '🔒' : it.completed ? '✓' : '◆';
-      const label = it.locked ? 'Locked' : it.completed ? 'Cleared' : 'Enter';
-      card.innerHTML =
-        `<span class="num">Level ${i + 1}</span>` +
-        `<span class="nm">${icon} ${label}</span>`;
-
+      // Blank blocks — no text or icons, just the lit tile itself.
       if (it.locked) {
         card.disabled = true;
       } else {

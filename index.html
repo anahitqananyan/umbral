@@ -241,49 +241,69 @@
       }
       .ls-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
-        gap: 18px;
+        grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+        gap: 34px 22px; /* extra row-gap leaves room for each block's 3D thickness */
       }
+      /* Level tiles rendered as glowing, extruded 3D blocks: the amber gradient
+         is the lit top face, the stacked flat box-shadows fake the block's side
+         thickness, and the soft dark shadow beneath grounds it on the floor. */
       .ls-card {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 22px 22px;
-        background: var(--panel);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 14px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 128px;
+        padding: 20px 18px;
+        border: none;
+        border-radius: 16px;
         cursor: pointer;
-        color: var(--ink);
+        color: #2a1e06;
         font-family: inherit;
-        text-align: left;
-        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        text-align: center;
+        background: linear-gradient(158deg, #ffffff 0%, #eef0f3 46%, #cfd3da 100%);
+        box-shadow:
+          0 5px 0 #b7bbc4,                 /* block side (thickness) */
+          0 11px 0 #969aa5,                /* deeper side */
+          0 18px 24px rgba(0, 0, 0, 0.55), /* cast shadow on the floor */
+          inset 0 2px 4px rgba(255, 255, 255, 0.95), /* top-face highlight */
+          inset 0 -3px 8px rgba(150, 156, 168, 0.4);  /* inner lower shade */
+        transform: translateY(0);
+        transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
       }
       .ls-card:hover {
-        transform: translateY(-3px);
-        border-color: rgba(216, 180, 106, 0.5);
-        background: rgba(20, 20, 26, 0.7);
+        transform: translateY(-6px);
+        filter: brightness(1.04);
+        box-shadow:
+          0 7px 0 #b7bbc4,
+          0 15px 0 #969aa5,
+          0 26px 32px rgba(0, 0, 0, 0.6),
+          0 0 28px rgba(255, 255, 255, 0.5), /* white glow */
+          inset 0 2px 4px rgba(255, 255, 255, 0.95),
+          inset 0 -3px 8px rgba(150, 156, 168, 0.4);
       }
+      .ls-card:active { transform: translateY(-1px); } /* press the block down */
       .ls-card .num {
         font-size: 11px;
-        letter-spacing: 0.34em;
+        letter-spacing: 0.3em;
         text-transform: uppercase;
-        color: var(--ink-dim);
+        font-weight: 600;
+        color: rgba(52, 36, 8, 0.72);
       }
-      .ls-card .nm { font-size: 24px; font-weight: 400; letter-spacing: 0.02em; }
+      .ls-card .nm { font-size: 22px; font-weight: 600; letter-spacing: 0.02em; color: #241a04; }
 
-      .ls-card.done { border-color: rgba(127, 214, 168, 0.35); }
-      .ls-card.done .nm { color: var(--glow); }
-      .ls-card.locked {
-        opacity: 0.45;
-        cursor: not-allowed;
-      }
+      /* Locked — same white block, but non-interactive (no hover lift). */
+      .ls-card.locked { cursor: not-allowed; }
       .ls-card.locked:hover {
         transform: none;
-        border-color: rgba(255, 255, 255, 0.08);
-        background: var(--panel);
+        filter: none;
+        box-shadow:
+          0 5px 0 #b7bbc4,
+          0 11px 0 #969aa5,
+          0 18px 24px rgba(0, 0, 0, 0.55),
+          inset 0 2px 4px rgba(255, 255, 255, 0.95),
+          inset 0 -3px 8px rgba(150, 156, 168, 0.4);
       }
-      .ls-card.locked .nm { color: var(--ink-dim); }
 
       /* open-settings button on the level-select page */
       .ls-settings-btn {
@@ -485,8 +505,6 @@
 
     <div id="level-select">
       <div class="ls-inner">
-        <div class="ls-eyebrow">Umbral</div>
-        <h2 class="ls-title">Choose a Shadow</h2>
         <div class="ls-grid" id="level-grid"></div>
       </div>
     </div>
