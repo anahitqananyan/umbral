@@ -4,17 +4,21 @@ import { WALL_Z } from '../core/LightRig.js';
 // The minimal dark room: a matte flat back wall that catches the puzzle object's
 // shadow (kept flat so the silhouette reads cleanly), a dark floor, and a barely
 // perceptible rug so the floor isn't empty without drawing the eye.
+// How far below the origin the floor sits. Dropping it deepens the room so the
+// puzzle form reads as floating in a taller space.
+const FLOOR_Y = -3;
+
 export function createWall() {
   const group = new THREE.Group();
 
-  const wallGeo = new THREE.PlaneGeometry(22, 16);
+  const wallGeo = new THREE.PlaneGeometry(22, 20);
   const wallMat = new THREE.MeshStandardMaterial({
     color: 0x6a6b72, // light enough that the cast shadow reads as a clear dark shape
     roughness: 0.98,
     metalness: 0.0,
   });
   const wall = new THREE.Mesh(wallGeo, wallMat);
-  wall.position.set(0, 6.5, WALL_Z);
+  wall.position.set(0, 4.5, WALL_Z); // taller & lower so it still meets the deeper floor
   wall.receiveShadow = true;
   group.add(wall);
 
@@ -27,7 +31,7 @@ export function createWall() {
   });
   const floor = new THREE.Mesh(floorGeo, floorMat);
   floor.rotation.x = -Math.PI / 2;
-  floor.position.set(0, 0, 0);
+  floor.position.set(0, FLOOR_Y, 0);
   floor.receiveShadow = true;
   group.add(floor);
 
@@ -42,7 +46,7 @@ export function createWall() {
   });
   const rug = new THREE.Mesh(rugGeo, rugMat);
   rug.rotation.x = -Math.PI / 2;
-  rug.position.set(0, 0.02, -0.5); // just above the floor to avoid z-fighting
+  rug.position.set(0, FLOOR_Y + 0.02, -0.5); // just above the floor to avoid z-fighting
   rug.receiveShadow = true;
   group.add(rug);
 
@@ -56,7 +60,7 @@ export function createWall() {
     metalness: 0.0,
   });
   const baseboard = new THREE.Mesh(baseGeo, baseMat);
-  baseboard.position.set(0, 0.27, WALL_Z + 0.03); // just in front of the wall
+  baseboard.position.set(0, FLOOR_Y + 0.27, WALL_Z + 0.03); // sits at the wall/floor junction
   baseboard.receiveShadow = true;
   group.add(baseboard);
 

@@ -30,6 +30,15 @@ export class Game {
     this.puzzle = null;
     this.won = false;
 
+    // Snap-to-solution: once the bar holds at ~95%, glide the object the last
+    // few degrees to its exact solution pose (identity) so the shadow resolves
+    // to 100% of the shape before the win card appears.
+    this.snapping = false;
+    this.snapT = 0;
+    this.snapDur = 0.6; // seconds
+    this.snapFrom = new THREE.Quaternion();
+    this.snapTo = new THREE.Quaternion(); // identity = solution pose
+
     // Subtle camera sway for life — does NOT affect the shadow or matcher
     // (the light and the match camera are fixed and independent).
     this.camBase = this.camera.position.clone();
@@ -146,6 +155,8 @@ export class Game {
     const level = LEVELS[index];
     this.levelIndex = index;
     this.won = false;
+    this.snapping = false;
+    this.snapT = 0;
 
     this.puzzle = buildObject(level);
     this.puzzle.quaternion.copy(level.startQuat); // scrambled start
@@ -174,6 +185,31 @@ export class Game {
     this.renderer.setSize(w, h);
   }
 
+  _beginSnap() {
+    this.snapping = true;
+    this.snapT = 0;
+    this.arcball.setEnabled(false); // no more dragging while it settles
+    this.hud.hideDragHint();
+    this.snapFrom.copy(this.puzzle.quaternion);
+    // snapTo stays identity (the solution pose the matcher captured against).
+  }
+
+  _updateSnap(dt) {
+    this.snapT = Math.min(1, this.snapT + dt / this.snapDur);
+    // easeInOutCubic for a settled, deliberate finish.
+    const t = this.snapT;
+    const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    this.puzzle.quaternion.slerpQuaternions(this.snapFrom, this.snapTo, e);
+    this.puzzle.updateMatrixWorld(true);
+    this.hud.setProximity(1); // bar reads full as it locks in
+
+    if (this.snapT >= 1) {
+      this.snapping = false;
+      this.puzzle.quaternion.copy(this.snapTo); // exact solution pose
+      this._handleWin();
+    }
+  }
+
   _handleWin() {
     this.won = true;
     this.arcball.setEnabled(false);
@@ -193,7 +229,9 @@ export class Game {
       this.matcher.update(dt, this.arcball.moving);
       this.hud.setProximity(this.matcher.proximity);
 
-      if (this.matcher.solved && !this.won) this._handleWin();
+      // Solve detected → glide to the exact solution pose, then show the win.
+      if (this.matcher.solved && !this.won && !this.snapping) this._beginSnap();
+      if (this.snapping) this._updateSnap(dt);
 
       // gentle camera sway
       this.swayT += dt;

@@ -467,21 +467,36 @@ export const LEVELS = [
     ],
   },
   {
-    name: 'Snowman',
-    hint: 'Three rounds of winter, stacked and smiling.',
-    solveThreshold: 0.9,
-    startQuat: quat(1.5, 1.4, 0.7),
+    name: 'Rudder Wheel',
+    hint: 'Grip its spokes and hold the vessel true against the sea.',
+    solveThreshold: 0.85,
+    startQuat: quat(1.0, 1.5, 0.8),
     pieces: [
-      // Base.
-      { type: 'sphere', args: [1.3, 28, 20], pos: [0.0, -1.4, 0.8] },
-      // Middle.
-      { type: 'sphere', args: [1.0, 26, 18], pos: [0.0, 0.3, -1.2] },
-      // Head.
-      { type: 'sphere', args: [0.75, 24, 18], pos: [0.0, 1.55, 1.0] },
-      // Hat brim.
-      { type: 'box', args: [1.4, 0.2, 1.0], pos: [0.0, 2.2, 0.4] },
-      // Hat top.
-      { type: 'box', args: [0.85, 0.75, 0.85], pos: [0.0, 2.65, -0.5] },
+      // A ship's wheel (helm) seen face-on: an outer rim, a small hub ring at the
+      // centre, six spindle spokes radiating out at 60° intervals, and six pointed
+      // handles projecting past the rim. Torus/sphere/cone already lie in the XY
+      // shadow plane, so no reorienting is needed — only the Z depths are spread
+      // wide so it resolves head-on and scatters into a metal tangle otherwise.
+      // Outer rim — the big wheel ring.
+      { type: 'torus', args: [1.9, 0.18, 20, 80], pos: [0.0, 0.0, -1.0] },
+      // Hub — the small ring with an open centre.
+      { type: 'torus', args: [0.36, 0.16, 16, 48], pos: [0.0, 0.0, 1.0] },
+      // Spokes — six stretched spindles from the hub out to the rim, each rotated
+      // to point radially (rot z = angle − 90°).
+      { type: 'sphere', args: [0.26, 30, 22], pos: [0.0, 1.05, 1.5], scale: [0.55, 2.9, 0.55], rot: [0, 0, 0.0] },
+      { type: 'sphere', args: [0.26, 30, 22], pos: [0.909, 0.525, -1.4], scale: [0.55, 2.9, 0.55], rot: [0, 0, -1.047] },
+      { type: 'sphere', args: [0.26, 30, 22], pos: [0.909, -0.525, 1.3], scale: [0.55, 2.9, 0.55], rot: [0, 0, -2.094] },
+      { type: 'sphere', args: [0.26, 30, 22], pos: [0.0, -1.05, -1.2], scale: [0.55, 2.9, 0.55], rot: [0, 0, 3.1416] },
+      { type: 'sphere', args: [0.26, 30, 22], pos: [-0.909, -0.525, 1.4], scale: [0.55, 2.9, 0.55], rot: [0, 0, 2.094] },
+      { type: 'sphere', args: [0.26, 30, 22], pos: [-0.909, 0.525, -1.3], scale: [0.55, 2.9, 0.55], rot: [0, 0, 1.047] },
+      // Handles — six cones jutting past the rim, apex pointing radially outward
+      // (base overlaps the rim so each grip joins the wheel cleanly).
+      { type: 'cone', args: [0.24, 0.85, 24], pos: [0.0, 2.35, -1.5], rot: [0, 0, 0.0] },
+      { type: 'cone', args: [0.24, 0.85, 24], pos: [2.035, 1.175, 1.4], rot: [0, 0, -1.047] },
+      { type: 'cone', args: [0.24, 0.85, 24], pos: [2.035, -1.175, -1.3], rot: [0, 0, -2.094] },
+      { type: 'cone', args: [0.24, 0.85, 24], pos: [0.0, -2.35, 1.2], rot: [0, 0, 3.1416] },
+      { type: 'cone', args: [0.24, 0.85, 24], pos: [-2.035, -1.175, -1.4], rot: [0, 0, 2.094] },
+      { type: 'cone', args: [0.24, 0.85, 24], pos: [-2.035, 1.175, 1.3], rot: [0, 0, 1.047] },
     ],
   },
   {
