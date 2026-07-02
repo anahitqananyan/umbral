@@ -86,8 +86,7 @@ export class Matcher {
     this._captureSolution();
   }
 
-  _renderMaskToBuffer() {
-    const group = this._group;
+  _renderMaskToBuffer(group = this._group) {
     const prevParent = group.parent;
 
     // Save clear state.
@@ -207,6 +206,58 @@ export class Matcher {
       this.solved = true;
       this._rawProx = 1;
     }
+  }
+
+  // Render `group` at its current (solution) pose and return a tightly-cropped
+  // black silhouette as a PNG data URL — the exact shadow the puzzle resolves to.
+  // Used to bake a recognizable figure onto each level-select block. Does not
+  // disturb the active matcher target (only the shared readback buffer, which is
+  // refreshed every sample).
+  silhouetteDataURL(group) {
+    this._renderMaskToBuffer(group);
+    this.maskScene.remove(group); // it had no prior parent; don't leave it attached
+
+    const buf = this.buffer;
+    // Build a top-down binary mask (readback is bottom-up, so flip Y).
+    const on = (x, y) => buf[((SIZE - 1 - y) * SIZE + x) * 4] > 127;
+
+    // Bounding box of the shape so the figure fills the block.
+    let minX = SIZE, minY = SIZE, maxX = -1, maxY = -1;
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        if (!on(x, y)) continue;
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+    if (maxX < 0) return null; // empty silhouette
+
+    const pad = 3;
+    minX = Math.max(0, minX - pad);
+    minY = Math.max(0, minY - pad);
+    maxX = Math.min(SIZE - 1, maxX + pad);
+    maxY = Math.min(SIZE - 1, maxY + pad);
+    const w = maxX - minX + 1;
+    const h = maxY - minY + 1;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    const img = ctx.createImageData(w, h);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const di = (y * w + x) * 4;
+        img.data[di] = 0;
+        img.data[di + 1] = 0;
+        img.data[di + 2] = 0;
+        img.data[di + 3] = on(minX + x, minY + y) ? 255 : 0; // solid black shape
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return canvas.toDataURL();
   }
 
   dispose() {

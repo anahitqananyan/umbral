@@ -95,7 +95,17 @@ export class HUD {
       if (it.locked) card.classList.add('locked');
       if (it.completed) card.classList.add('done');
 
-      // Blank blocks — no text or icons, just the lit tile itself.
+      // Each unlocked block shows the level's silhouette — that puzzle's own
+      // solved shadow. Locked levels stay blank so the shape remains a mystery.
+      if (it.icon && !it.locked) {
+        const fig = document.createElement('img');
+        fig.className = 'ls-fig';
+        fig.src = it.icon;
+        fig.alt = '';
+        fig.draggable = false;
+        card.appendChild(fig);
+      }
+
       if (it.locked) {
         card.disabled = true;
       } else {

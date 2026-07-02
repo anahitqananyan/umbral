@@ -122,10 +122,30 @@ export class Game {
     this.hud.showLevelSelect();
   }
 
+  // Bake a black silhouette figure for every level once — each is that puzzle's
+  // own solved shadow, so it looks exactly like the shape you're rotating toward.
+  _ensureLevelIcons() {
+    if (this._levelIcons) return this._levelIcons;
+    this._levelIcons = LEVELS.map((level) => {
+      const obj = buildObject(level); // built at identity = the solution pose
+      const url = this.matcher.silhouetteDataURL(obj);
+      const mats = new Set();
+      obj.traverse((o) => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) mats.add(o.material);
+      });
+      mats.forEach((m) => m.dispose());
+      return url;
+    });
+    return this._levelIcons;
+  }
+
   _refreshLevelSelect() {
+    const icons = this._ensureLevelIcons();
     const items = LEVELS.map((_, i) => ({
       locked: !this._isUnlocked(i),
       completed: this.completed.has(i),
+      icon: icons[i],
     }));
     this.hud.renderLevelSelect(items, (i) => this.selectLevel(i));
   }
