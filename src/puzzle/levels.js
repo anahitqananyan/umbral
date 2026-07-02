@@ -13,6 +13,42 @@ function quat(x, y, z) {
   return new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z));
 }
 
+// --- Procedural helpers (used by the Gecko, whose splayed limbs/tail are far
+// easier to trace as a curve of capsules than to hand-place piece by piece) ---
+
+// A capsule spanning A→B in the XY plane with radius `r`. A capsule's long axis
+// is Y, so we rotate by (edge angle − 90°). The rounded caps extend ~r past each
+// end, so consecutive segments overlap into one smooth limb.
+function limb(ax, ay, bx, by, r, z) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const len = Math.hypot(dx, dy);
+  return {
+    type: 'capsule',
+    args: [r, Math.max(0.01, len), 10, 16],
+    pos: [(ax + bx) / 2, (ay + by) / 2, z],
+    rot: [0, 0, Math.atan2(dy, dx) - Math.PI / 2],
+  };
+}
+
+// A splayed foot centred at (cx,cy): `n` slender rounded capsules (toe-pads)
+// fanning symmetrically around the `outward` direction (radians). Toe depths are
+// nudged apart so the fan scatters from off-axis views like everything else.
+function foot(cx, cy, outward, z, n = 5, spread = 2.2, toeLen = 0.5, toeR = 0.08) {
+  const toes = [];
+  for (let i = 0; i < n; i++) {
+    const t = n === 1 ? 0 : i / (n - 1) - 0.5; // −0.5 … 0.5
+    const a = outward + t * spread;
+    toes.push({
+      type: 'capsule',
+      args: [toeR, toeLen, 8, 12],
+      pos: [cx + Math.cos(a) * (toeLen / 2), cy + Math.sin(a) * (toeLen / 2), z + (i % 2 ? 0.16 : -0.16)],
+      rot: [0, 0, a - Math.PI / 2],
+    });
+  }
+  return toes;
+}
+
 export const LEVELS = [
   {
     name: 'Rabbit',
@@ -525,49 +561,43 @@ export const LEVELS = [
   {
     name: 'Gecko',
     hint: 'It scales sheer walls on toes that never slip.',
-    solveThreshold: 0.8,
+    solveThreshold: 0.86, // stricter: the shape must line up more precisely
+    scale: 0.75, // a smaller, more delicate form — harder to read and align
     startQuat: quat(0.9, 1.6, 1.2),
+    // Traced to match a climbing-gecko silhouette: bulbous head at the lower-left
+    // with the snout pointing down-left, an S-curved body, a long tail sweeping
+    // up and to the right and curling over at the tip, and four limbs splayed to
+    // big fan-toed feet (two lower, near the head; two upper, near the tail base).
+    // Built with the limb()/foot() helpers; Z depths are spread wide so it only
+    // resolves head-on and scatters into a tangle of capsules otherwise.
     pieces: [
-      // A climbing gecko: an S-curved body from the snout (upper-left) down to the
-      // hips, a long tail sweeping up and around to the right, and four limbs
-      // splayed to fan-toed feet. Built from tapering capsules (no spheres) so the
-      // limbs and tail stay clean. (Z depths spread wide so it only resolves
-      // head-on and scatters into noise otherwise.)
-      // Spine — snout, neck, fore-body, hips.
-      { type: 'capsule', args: [0.28, 0.32, 10, 16], pos: [-1.7, 1.275, 1.4], rot: [0, 0, -2.486] },
-      { type: 'capsule', args: [0.29, 0.28, 10, 16], pos: [-1.2, 0.6, -1.3], rot: [0, 0, -2.521] },
-      { type: 'capsule', args: [0.31, 0.21, 10, 16], pos: [-0.725, -0.1, 1.2], rot: [0, 0, -2.57] },
-      { type: 'capsule', args: [0.3, 0.12, 10, 16], pos: [-0.275, -0.675, -1.4], rot: [0, 0, -2.356] },
-      // Tail — a long arc sweeping up and to the right, tapering to a thin tip.
-      { type: 'capsule', args: [0.27, 0.13, 10, 16], pos: [0.25, -0.75, 1.3], rot: [0, 0, -1.107] },
-      { type: 'capsule', args: [0.23, 0.35, 10, 16], pos: [0.85, -0.325, -1.2], rot: [0, 0, -0.828] },
-      { type: 'capsule', args: [0.19, 0.5, 10, 16], pos: [1.375, 0.325, 1.5], rot: [0, 0, -0.541] },
-      { type: 'capsule', args: [0.145, 0.535, 10, 16], pos: [1.7, 1.1, -1.3], rot: [0, 0, -0.245] },
-      { type: 'capsule', args: [0.095, 0.517, 10, 16], pos: [1.75, 1.85, 1.4], rot: [0, 0, 0.142] },
-      // Front-left limb — reaching up and to the left.
-      { type: 'capsule', args: [0.15, 0.94, 10, 16], pos: [-1.675, 0.95, 1.5], rot: [0, 0, 0.87] },
-      // Front-right limb — reaching up and to the right (rooted deep in the spine).
-      { type: 'capsule', args: [0.15, 1.0, 10, 16], pos: [-0.334, 0.426, -1.5], rot: [0, 0, -0.632] },
-      // Hind-left limb — splayed out to the left (rooted deep in the spine).
-      { type: 'capsule', args: [0.15, 1.43, 10, 16], pos: [-1.112, -0.462, 1.2], rot: [0, 0, 1.322] },
-      // Hind-right limb — kicked down and to the right.
-      { type: 'capsule', args: [0.15, 0.73, 10, 16], pos: [0.3, -1.325, -1.2], rot: [0, 0, -2.391] },
-      // Front-left foot — three splayed toes.
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.202, 1.522, 1.4], rot: [0, 0, 0.289] },
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.277, 1.477, -1.3], rot: [0, 0, 0.789] },
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.323, 1.399, 1.3], rot: [0, 0, 1.289] },
-      // Front-right foot.
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.208, 1.036, -1.4], rot: [0, 0, -1.071] },
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.147, 1.101, 1.3], rot: [0, 0, -0.571] },
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.063, 1.129, -1.3], rot: [0, 0, -0.071] },
-      // Hind-left foot.
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.107, -0.163, 1.4], rot: [0, 0, 1.069] },
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.13, -0.25, -1.3], rot: [0, 0, 1.569] },
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [-2.107, -0.337, 1.3], rot: [0, 0, 2.069] },
-      // Hind-right foot.
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.645, -1.88, -1.4], rot: [0, 0, -3.171] },
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.732, -1.86, 1.3], rot: [0, 0, -2.671] },
-      { type: 'capsule', args: [0.06, 0.28, 8, 12], pos: [0.799, -1.802, -1.3], rot: [0, 0, -2.171] },
+      // Head — a rounded mass plus an elongated jaw/snout aimed down-left.
+      { type: 'sphere', args: [0.6, 32, 24], pos: [-1.85, -2.45, 1.4], scale: [1.12, 1.0, 1.0] },
+      limb(-1.0, -1.5, -2.05, -2.7, 0.48, -1.35),
+      // Body — the S-curve, tapering as it climbs toward the hips.
+      limb(-1.0, -1.5, -0.42, -0.62, 0.53, 1.3),
+      limb(-0.42, -0.62, -0.05, 0.25, 0.5, -1.2),
+      limb(-0.05, 0.25, 0.2, 1.12, 0.44, 1.2),
+      limb(0.2, 1.12, 0.44, 1.7, 0.38, -1.15),
+      // Tail — a long arc up and to the right, curling over and tapering to a tip.
+      limb(0.44, 1.7, 0.95, 2.3, 0.33, 1.5),
+      limb(0.95, 2.3, 1.55, 2.7, 0.27, -1.4),
+      limb(1.55, 2.7, 2.12, 2.85, 0.21, 1.35),
+      limb(2.12, 2.85, 2.55, 2.7, 0.15, -1.25),
+      limb(2.55, 2.7, 2.78, 2.33, 0.1, 1.45),
+      limb(2.78, 2.33, 2.72, 1.98, 0.055, -1.35),
+      // Front-left leg — reaching out to the left; foot fanned up-left.
+      limb(-0.82, -1.35, -2.1, -0.72, 0.14, -1.5),
+      ...foot(-2.35, -0.58, 2.62, 1.25),
+      // Front-right leg — dropping down and to the right; foot fanned down-right.
+      limb(-0.52, -1.05, 0.33, -1.95, 0.14, 1.5),
+      ...foot(0.48, -2.2, -0.86, -1.25),
+      // Hind-left leg — splayed up and to the left; foot fanned up-left.
+      limb(0.05, 0.88, -1.45, 1.45, 0.15, -1.45),
+      ...foot(-1.72, 1.55, 2.75, 1.35),
+      // Hind-right leg — reaching out to the right; foot fanned right.
+      limb(0.35, 1.22, 1.22, 0.9, 0.15, 1.45),
+      ...foot(1.5, 0.8, -0.35, -1.35),
     ],
   },
 ];

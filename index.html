@@ -241,13 +241,15 @@
       }
       .ls-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
-        gap: 34px 22px; /* extra row-gap leaves room for each block's 3D thickness */
+        grid-template-columns: repeat(4, 1fr);
+        gap: 46px 56px; /* blocks sit farther apart; the wide column gap holds the connector line */
+        align-items: center;
       }
       /* Level tiles rendered as glowing, extruded 3D blocks: the amber gradient
          is the lit top face, the stacked flat box-shadows fake the block's side
          thickness, and the soft dark shadow beneath grounds it on the floor. */
       .ls-card {
+        position: relative; /* anchors the dashed connector line to the next block */
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -283,6 +285,27 @@
           inset 0 -3px 8px rgba(150, 156, 168, 0.4);
       }
       .ls-card:active { transform: translateY(-1px); } /* press the block down */
+      /* White dashed line running across the gap to the next block in the row. */
+      .ls-card::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        width: 56px; /* = column gap, so it spans exactly to the next block */
+        height: 5px;
+        transform: translateY(-50%);
+        background-image: repeating-linear-gradient(
+          to right,
+          #ffffff 0 12px,
+          transparent 12px 21px
+        );
+        pointer-events: none;
+      }
+      /* No trailing line off the last block in each row (4 columns) or the last one. */
+      .ls-card:nth-child(4n)::after,
+      .ls-card:last-child::after {
+        content: none;
+      }
       /* The level's silhouette figure, centred on the block's lit top face. */
       .ls-fig {
         width: 74%;
@@ -484,7 +507,7 @@
         </div>
         <div class="brand">
           Umbral
-          <small>cast a shadow worth knowing</small>
+          <small>Where the light ends and the real story starts.</small>
         </div>
       </div>
 
@@ -507,7 +530,7 @@
 
     <div id="main-menu">
       <h1 class="mm-title">Umbral</h1>
-      <div class="mm-tagline">cast a shadow worth knowing</div>
+      <div class="mm-tagline">Where the light ends and the real story starts.</div>
       <button class="mm-play" id="play-btn">Play</button>
       <button class="ls-settings-btn" id="settings-open">⚙ Settings</button>
     </div>

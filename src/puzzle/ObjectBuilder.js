@@ -63,5 +63,9 @@ export function buildObject(level) {
 
   group.position.copy(OBJECT_CENTER);
   group.quaternion.identity();
+  // Optional uniform scale for the whole object (positions + sizes). Rotation is
+  // driven separately by the arcball, and the matcher captures at identity
+  // rotation, so a persistent group scale is safe and shrinks the shadow too.
+  if (level.scale) group.scale.setScalar(level.scale);
   return group;
 }

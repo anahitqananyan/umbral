@@ -208,24 +208,61 @@ export class Matcher {
     }
   }
 
-  // Render `group` at its current (solution) pose and return a tightly-cropped
-  // black silhouette as a PNG data URL — the exact shadow the puzzle resolves to.
-  // Used to bake a recognizable figure onto each level-select block. Does not
-  // disturb the active matcher target (only the shared readback buffer, which is
-  // refreshed every sample).
+  // Render `group` at its current (solution) pose and return a black silhouette
+  // as a PNG data URL — the exact shadow the puzzle resolves to — for baking a
+  // recognizable figure onto each level-select block. Rendered at high res with
+  // MSAA (smooth, un-blocky edges) and normalized into a fixed square canvas so
+  // every level's figure comes out the same size regardless of its proportions.
+  // Uses a dedicated render target, so it never disturbs the live matcher.
   silhouetteDataURL(group) {
-    this._renderMaskToBuffer(group);
-    this.maskScene.remove(group); // it had no prior parent; don't leave it attached
+    const R = 512; // hi-res source render → smooth edges
+    const OUT = 256; // uniform square output (all icons identical dimensions)
+    const FILL = 0.9; // fraction of the square the shape's longest side spans
 
-    const buf = this.buffer;
-    // Build a top-down binary mask (readback is bottom-up, so flip Y).
-    const on = (x, y) => buf[((SIZE - 1 - y) * SIZE + x) * 4] > 127;
+    if (!this._iconRT) {
+      this._iconRT = new THREE.WebGLRenderTarget(R, R, {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        depthBuffer: true,
+        stencilBuffer: false,
+        generateMipmaps: false,
+        format: THREE.RGBAFormat,
+        type: THREE.UnsignedByteType,
+        samples: 4, // MSAA → anti-aliased silhouette edges
+      });
+      this._iconBuf = new Uint8Array(R * R * 4);
+    }
 
-    // Bounding box of the shape so the figure fills the block.
-    let minX = SIZE, minY = SIZE, maxX = -1, maxY = -1;
-    for (let y = 0; y < SIZE; y++) {
-      for (let x = 0; x < SIZE; x++) {
-        if (!on(x, y)) continue;
+    // Render the group's mask into the hi-res target (mirrors _renderMaskToBuffer
+    // but targets _iconRT). Save/restore renderer state and re-parent the group.
+    const prevParent = group.parent;
+    const prevTarget = this.renderer.getRenderTarget();
+    const prevClear = this.renderer.getClearColor(this._tmpColor).clone();
+    const prevAlpha = this.renderer.getClearAlpha();
+
+    this.maskScene.add(group);
+    group.updateMatrixWorld(true);
+    this.renderer.setRenderTarget(this._iconRT);
+    this.renderer.setClearColor(0x000000, 1);
+    this.renderer.clear(true, true, false);
+    this.renderer.render(this.maskScene, this.camera);
+    this.renderer.readRenderTargetPixels(this._iconRT, 0, 0, R, R, this._iconBuf);
+
+    this.renderer.setRenderTarget(prevTarget);
+    this.renderer.setClearColor(prevClear, prevAlpha);
+    this.maskScene.remove(group);
+    if (prevParent) prevParent.add(group);
+
+    const buf = this._iconBuf;
+    // Coverage 0..255 (readback is bottom-up, so flip Y). MSAA + white-on-black
+    // means edge pixels carry partial coverage — used directly as the alpha.
+    const cover = (x, y) => buf[((R - 1 - y) * R + x) * 4];
+
+    // Bounding box of the shape (anything with meaningful coverage).
+    let minX = R, minY = R, maxX = -1, maxY = -1;
+    for (let y = 0; y < R; y++) {
+      for (let x = 0; x < R; x++) {
+        if (cover(x, y) < 24) continue;
         if (x < minX) minX = x;
         if (x > maxX) maxX = x;
         if (y < minY) minY = y;
@@ -234,34 +271,45 @@ export class Matcher {
     }
     if (maxX < 0) return null; // empty silhouette
 
-    const pad = 3;
-    minX = Math.max(0, minX - pad);
-    minY = Math.max(0, minY - pad);
-    maxX = Math.min(SIZE - 1, maxX + pad);
-    maxY = Math.min(SIZE - 1, maxY + pad);
-    const w = maxX - minX + 1;
-    const h = maxY - minY + 1;
+    const bw = maxX - minX + 1;
+    const bh = maxY - minY + 1;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    const img = ctx.createImageData(w, h);
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        const di = (y * w + x) * 4;
+    // Cropped, anti-aliased black silhouette at source resolution.
+    const src = document.createElement('canvas');
+    src.width = bw;
+    src.height = bh;
+    const sctx = src.getContext('2d');
+    const img = sctx.createImageData(bw, bh);
+    for (let y = 0; y < bh; y++) {
+      for (let x = 0; x < bw; x++) {
+        const di = (y * bw + x) * 4;
         img.data[di] = 0;
         img.data[di + 1] = 0;
         img.data[di + 2] = 0;
-        img.data[di + 3] = on(minX + x, minY + y) ? 255 : 0; // solid black shape
+        img.data[di + 3] = cover(minX + x, minY + y); // smooth edge alpha
       }
     }
-    ctx.putImageData(img, 0, 0);
-    return canvas.toDataURL();
+    sctx.putImageData(img, 0, 0);
+
+    // Normalize into a fixed square: longest side → FILL*OUT, centred, smoothly
+    // scaled. This makes every level's figure the same size.
+    const out = document.createElement('canvas');
+    out.width = OUT;
+    out.height = OUT;
+    const octx = out.getContext('2d');
+    octx.imageSmoothingEnabled = true;
+    octx.imageSmoothingQuality = 'high';
+    const scale = (OUT * FILL) / Math.max(bw, bh);
+    const dw = bw * scale;
+    const dh = bh * scale;
+    octx.drawImage(src, (OUT - dw) / 2, (OUT - dh) / 2, dw, dh);
+
+    return out.toDataURL();
   }
 
   dispose() {
     this.rt.dispose();
+    this._iconRT?.dispose();
     this.maskScene.overrideMaterial.dispose();
   }
 }
