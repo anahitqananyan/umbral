@@ -225,7 +225,7 @@
         transition: opacity 0.5s ease;
       }
       #level-select.show { opacity: 1; pointer-events: auto; }
-      .ls-inner { width: min(900px, 92vw); text-align: center; }
+      .ls-inner { width: min(1180px, 96vw); height: min(660px, 86vh); position: relative; }
       .ls-eyebrow {
         font-size: 12px;
         letter-spacing: 0.5em;
@@ -239,24 +239,29 @@
         letter-spacing: 0.04em;
         margin: 12px 0 34px;
       }
+      /* The levels are laid out as an oval "track" around the screen (see
+         renderLevelSelect): #level-grid is the positioning host, each block is
+         absolutely placed on the oval, dashed segments close the loop between
+         them, and a translucent panel sits in the middle. */
       .ls-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 46px 56px; /* blocks sit farther apart; the wide column gap holds the connector line */
-        align-items: center;
+        position: relative;
+        width: 100%;
+        height: 100%;
       }
-      /* Level tiles rendered as glowing, extruded 3D blocks: the amber gradient
-         is the lit top face, the stacked flat box-shadows fake the block's side
-         thickness, and the soft dark shadow beneath grounds it on the floor. */
+      /* Level tiles: glowing white 3D blocks placed on the oval track. The stacked
+         box-shadows fake the block's side thickness; the orange shadow grounds it. */
       .ls-card {
-        position: relative; /* anchors the dashed connector line to the next block */
+        position: absolute;
+        width: 96px;
+        height: 90px;
+        margin-left: -48px; /* centre the block on its point */
+        margin-top: -45px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        min-height: 128px;
-        padding: 20px 18px;
+        gap: 6px;
+        padding: 10px;
         border: none;
         border-radius: 16px;
         cursor: pointer;
@@ -265,46 +270,80 @@
         text-align: center;
         background: linear-gradient(158deg, #ffffff 0%, #eef0f3 46%, #cfd3da 100%);
         box-shadow:
-          0 5px 0 #b7bbc4,                 /* block side (thickness) */
-          0 11px 0 #969aa5,                /* deeper side */
-          0 18px 24px rgba(0, 0, 0, 0.55), /* cast shadow on the floor */
+          0 5px 0 #b7bbc4,                      /* block side (thickness) */
+          0 10px 0 #969aa5,                     /* deeper side */
+          0 16px 22px rgba(196, 104, 28, 0.42), /* slightly orange cast shadow */
           inset 0 2px 4px rgba(255, 255, 255, 0.95), /* top-face highlight */
           inset 0 -3px 8px rgba(150, 156, 168, 0.4);  /* inner lower shade */
         transform: translateY(0);
         transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+        z-index: 2;
       }
       .ls-card:hover {
         transform: translateY(-6px);
         filter: brightness(1.04);
         box-shadow:
           0 7px 0 #b7bbc4,
-          0 15px 0 #969aa5,
-          0 26px 32px rgba(0, 0, 0, 0.6),
-          0 0 28px rgba(255, 255, 255, 0.5), /* white glow */
+          0 13px 0 #969aa5,
+          0 24px 30px rgba(196, 104, 28, 0.5), /* slightly orange cast shadow */
+          0 0 26px rgba(216, 180, 106, 0.45),  /* warm glow */
           inset 0 2px 4px rgba(255, 255, 255, 0.95),
           inset 0 -3px 8px rgba(150, 156, 168, 0.4);
       }
       .ls-card:active { transform: translateY(-1px); } /* press the block down */
-      /* White dashed line running across the gap to the next block in the row. */
-      .ls-card::after {
+      /* The single diamond-shaped level (the hub the two lines start from). Its
+         face is a rotated square drawn in ::before, so the figure and name stay
+         upright; the warm cast shadow comes from a drop-shadow that follows the
+         diamond outline (an outset box-shadow can't take the rotated shape). */
+      .ls-diamond {
+        background: transparent;
+        box-shadow: none;
+        filter: drop-shadow(0 9px 10px rgba(196, 104, 28, 0.5));
+      }
+      .ls-diamond::before {
         content: '';
         position: absolute;
-        top: 50%;
-        left: 100%;
-        width: 56px; /* = column gap, so it spans exactly to the next block */
-        height: 5px;
-        transform: translateY(-50%);
+        inset: 12%;
+        background: linear-gradient(158deg, #ffffff 0%, #eef0f3 46%, #cfd3da 100%);
+        border-radius: 13px;
+        transform: rotate(45deg);
+        box-shadow:
+          inset 0 2px 4px rgba(255, 255, 255, 0.95),
+          inset 0 -3px 8px rgba(150, 156, 168, 0.4);
+        z-index: -1;
+      }
+      .ls-diamond:hover {
+        box-shadow: none;
+        filter: drop-shadow(0 13px 14px rgba(196, 104, 28, 0.6)) brightness(1.04);
+      }
+      .ls-diamond .ls-fig { width: 56%; height: 56%; }
+      /* One dashed segment of the loop, connecting two adjacent blocks. */
+      .ls-link {
+        position: absolute;
+        height: 4px;
         background-image: repeating-linear-gradient(
           to right,
-          #ffffff 0 12px,
-          transparent 12px 21px
+          #ffffff 0 8px,
+          transparent 8px 15px
         );
+        opacity: 0.8;
         pointer-events: none;
+        z-index: 1;
       }
-      /* No trailing line off the last block in each row (4 columns) or the last one. */
-      .ls-card:nth-child(4n)::after,
-      .ls-card:last-child::after {
-        content: none;
+      /* The translucent panel inside the ring. */
+      .ls-center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 46%;
+        height: 54%;
+        transform: translate(-50%, -50%);
+        border-radius: 28px;
+        background: linear-gradient(160deg, rgba(42, 42, 50, 0.55), rgba(18, 18, 24, 0.5));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 60px rgba(0, 0, 0, 0.45);
+        pointer-events: none;
+        z-index: 0;
       }
       /* The level's silhouette figure, centred on the block's lit top face. */
       .ls-fig {
@@ -314,6 +353,29 @@
         pointer-events: none;
         user-select: none;
         filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+      }
+      /* Object name — a tooltip that fades in above the block on hover. */
+      .ls-name {
+        position: absolute;
+        bottom: calc(100% + 12px);
+        left: 50%;
+        transform: translateX(-50%) translateY(5px);
+        white-space: nowrap;
+        padding: 5px 13px;
+        border-radius: 9px;
+        background: rgba(16, 16, 22, 0.92);
+        color: #f3efe6;
+        font-size: 13px;
+        letter-spacing: 0.05em;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.16s ease, transform 0.16s ease;
+        z-index: 5;
+      }
+      .ls-card:hover .ls-name {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
       }
       .ls-card .num {
         font-size: 11px;
@@ -332,7 +394,7 @@
         box-shadow:
           0 5px 0 #b7bbc4,
           0 11px 0 #969aa5,
-          0 18px 24px rgba(0, 0, 0, 0.55),
+          0 18px 24px rgba(196, 104, 28, 0.42), /* slightly orange cast shadow */
           inset 0 2px 4px rgba(255, 255, 255, 0.95),
           inset 0 -3px 8px rgba(150, 156, 168, 0.4);
       }

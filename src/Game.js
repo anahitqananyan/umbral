@@ -142,10 +142,11 @@ export class Game {
 
   _refreshLevelSelect() {
     const icons = this._ensureLevelIcons();
-    const items = LEVELS.map((_, i) => ({
+    const items = LEVELS.map((level, i) => ({
       locked: !this._isUnlocked(i),
       completed: this.completed.has(i),
       icon: icons[i],
+      name: level.name,
     }));
     this.hud.renderLevelSelect(items, (i) => this.selectLevel(i));
   }
